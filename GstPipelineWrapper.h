@@ -1,36 +1,39 @@
 #pragma once
 
 #include <string>
-#include <gst/gst.h>
+
 #include <boost/thread.hpp>
+#include <boost/thread/lock_guard.hpp>
+#include <gst/gst.h>
 
 class GstPipelineWrapper
 {
 public:
-	GstPipelineWrapper(void);
-	~GstPipelineWrapper(void);
+    GstPipelineWrapper(void);
+    virtual ~GstPipelineWrapper();
 
-	void		InitializePipelineWithString(std::string pipelineString);
-	GstElement* GetElementByName(std::string element_name);
+    void InitializePipelineWithString(std::string pipelineString);
+    GstElement* GetElementByName(std::string element_name);
 
-	void		set_is_verbose(bool is_verbose);
-	bool		get_is_verbose() const ; 
+    bool SetPipelineState(GstState state);
+    GstState GetPipelineState();
 
-	bool		SetPipelineState(GstState state);
-	GstState	GetPipelineState();
+    void WaitForEOS();
 
-private:
-	bool			is_verbose_; // default: false
+    void set_is_verbose(bool is_verbose);
+    bool get_is_verbose() const;
 
-	GstElement*		pipeline_;
-	GstBus*			bus_;
+protected:
+    bool is_verbose_; // default: false
 
-	boost::thread	g_main_loop_thread_;
-	void			RunningMainLoop();
+    GstElement* pipeline_;
+    GstBus* bus_;
 
-	void			FreePipeline();
+    boost::thread g_main_loop_thread_;
+    void RunningMainLoop();
 
-	static bool 	GstMessageParser(GstBus* bus, GstMessage* msg, GstPipelineWrapper* pipeline);
-	static void		EnsureGstreamerInitialization();
+    void FreePipeline();
 
+    static bool GstMessageParser(GstBus* bus, GstMessage* msg, GstPipelineWrapper* pipeline);
+    static void EnsureGstreamerInitialization();
 };

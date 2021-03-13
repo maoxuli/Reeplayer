@@ -7,7 +7,6 @@
 GstAppSinkPipeline::GstAppSinkPipeline()
 : retrievedBuffer(0)
 , currentBuffer(0)
-, is_streaming_(true)
 {
 
 }
@@ -59,15 +58,8 @@ void GstAppSinkPipeline::DestroyCallback(gpointer user_data)
 	std::cout << "DESTROY" << std::endl;
 }
 
-void GstAppSinkPipeline::set_is_streaming(bool is_streaming)
-{
-	is_streaming_ = is_streaming;
-}
-
 void GstAppSinkPipeline::ReceiveNewSample()
-{
-	if (!is_streaming_) return;
-	
+{	
 	GstSample* sample = gst_app_sink_pull_sample(GST_APP_SINK(appsink));
 	
 	if (sample)
@@ -127,4 +119,23 @@ bool GstAppSinkPipeline::GetLatestFrameBuffer(void** frameBuffer)
 	}
 	
 	return true;
+}
+
+bool GstAppSinkPipeline::GetResolution(int* width, int* height)
+{
+    GstCaps *caps;
+    GstStructure *s;
+    *width = 0;
+    *height = 0;
+
+    boost::lock_guard<boost::mutex> guard(bufferMutex);
+    if (currentBuffer != 0) {
+        caps = gst_sample_get_caps(currentBuffer);
+        s = gst_caps_get_structure(caps, 0);
+        gst_structure_get_int(s, "width", width);
+        gst_structure_get_int(s, "height", height);
+        // printf("resolution: %dx%d\n", *width, *height);
+        return true;
+    }
+    return false;
 }

@@ -10,7 +10,10 @@
 #include <QPushButton>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    is_streaming(false),
+    image_width(0),
+    image_height(0)
 {
     setWindowTitle("Reeplayer");
     QRect rc = QDesktopWidget().availableGeometry();
@@ -30,10 +33,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setStatusBar(status_bar);
 
     // image view
-    ImageView *image_view_0 = new ImageView(center_widget);
-    ImageView *image_view_1 = new ImageView(center_widget);
+    image_view_0 = new ImageView(center_widget);
+    image_view_1 = new ImageView(center_widget);
 
     // buttons
+    qDebug() << "create buttons";
     QFrame *menu_bar = new QFrame(center_widget);
     menu_bar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     menu_bar->setFixedHeight(50);
@@ -50,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stop_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     stop_button->setFixedHeight(40);
 
+    qDebug() << "layout buttons";
     QHBoxLayout *h_layout= new QHBoxLayout(menu_bar);
     h_layout->addWidget(connect_button);
     h_layout->addWidget(play_button);
@@ -57,39 +62,74 @@ MainWindow::MainWindow(QWidget *parent) :
     menu_bar->setLayout((h_layout));
 
     // main layout
+    qDebug() << "layout main view";
     QVBoxLayout *v_layout = new QVBoxLayout(center_widget);
     v_layout->addWidget(image_view_0);
     v_layout->addWidget(image_view_1);
     v_layout->addWidget(menu_bar);
-    this->setLayout(v_layout);
+    center_widget->setLayout(v_layout);
 
     // signal-slot
-    connect(connect_button, SIGNAL(clicked()), this, SLOT(connect()));
-    connect(&sink_pipeline, SIGNAL(received()), this, SLOT(update_frame()));
+    qDebug() << "connect signals";
+    QObject::connect(&update_timer, SIGNAL(timeout()), this, SLOT(update_frame()));
+    QObject::connect(connect_button, SIGNAL(clicked()), this, SLOT(connect()));
+    QObject::connect(stop_button, SIGNAL(clicked()), this, SLOT(disconnect()));
 }
 
 MainWindow::~MainWindow()
 {
-
+    disconnect();
 }
 
 // connect to RTSP
 void MainWindow::connect()
 {
-    std::string pipeline_str = CreateRtspSinkPipeline("rtsp://192.168.1.188:8554/ds-stream");
-    qDebug() << pipeline_str;
+    qDebug() << "connecting";
+    std::string pipeline_str = CreateRtspSinkPipeline("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
+    qDebug() << pipeline_str.c_str();
     sink_pipeline.reset(new GstAppSinkPipeline());
     sink_pipeline->Initialize(pipeline_str);
     sink_pipeline->SetPipelineState(GST_STATE_PLAYING);
+    update_timer.start(1000.0/30.0);
+}
+
+void MainWindow::disconnect()
+{
+    qDebug() << "disconnecting";
+    update_timer.stop();
+    sink_pipeline->SetPipelineState(GST_STATE_NULL);
+    sink_pipeline.reset();
+    is_streaming = false;
+    image_width = 0;
+    image_height = 0;
 }
 
 // update frame from sink pipeline to image view
 void MainWindow::update_frame()
 {
-    if (sink_pipeline.CheckNewFrames() &&
-        sink_pipeline.GetFrames(buffer))
+    if (!is_streaming)
     {
-        //QImage
-        sink_pipeline.ReleaseFrameBuffer();
+        qDebug() << "waiting";
+        int width, height;
+        if (sink_pipeline->GetIsNewFrameAvailable() &&
+            sink_pipeline->GetResolution(&image_width, &image_height))
+        {
+            image_view_0->Reset(image_width, image_height);
+            image_view_1->Reset(image_width, image_height);
+            is_streaming = true;
+        }
+    }
+    else
+    {
+        qDebug() << "streaming";
+        void* buffer;
+        if (sink_pipeline->GetIsNewFrameAvailable() &&
+            sink_pipeline->GetLatestFrameBuffer(&buffer))
+        {
+            QImage image((unsigned char*)buffer, image_width, image_height, QImage::Format_RGB888);
+            image_view_0->UpdateImage(image);
+            image_view_1->UpdateImage(image);
+            sink_pipeline->ReleaseFrameBuffer();
+        }
     }
 }

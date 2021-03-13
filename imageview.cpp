@@ -2,6 +2,7 @@
 #include <QScrollBar>
 #include <QKeyEvent>
 #include <cassert>
+#include <QDebug>
 
 ImageView::ImageView(QWidget *parent)
     : QGraphicsView(parent)

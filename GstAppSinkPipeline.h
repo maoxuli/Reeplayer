@@ -15,11 +15,9 @@ public:
 	bool GetLatestFrameBuffer(void** frameBuffer);
 	void ReleaseFrameBuffer();
 
-	void set_is_streaming(bool is_streaming);
+    bool GetResolution(int* width, int* height);
 
 private:
-	bool 			is_streaming_;
-
 	GstElement* 	appsink;
 
 	boost::mutex	bufferMutex;
