@@ -8,6 +8,17 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+QT_CONFIG -= no-pkg-config
+CONFIG += link_pkgconfig
+PKGCONFIG = \
+    gstreamer-1.0 \
+    gstreamer-video-1.0 \
+    gstreamer-app-1.0
+
+DEFINES += GST_USE_UNSTABLE_API
+
+LIBS += -lboost_thread -lboost_system
+
 TARGET = reeplayer
 TEMPLATE = app
 
@@ -26,10 +37,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    imageview.cpp
+    imageview.cpp \
+    GstPipelineWrapper.cpp \
+    GstAppSinkPipeline.cpp
 
 HEADERS += \
     mainwindow.h \
-    imageview.h
+    imageview.h \
+    GstPipelineWrapper.h \
+    GstAppSinkPipeline.h \
+    GstreamerPipelines.h
 
 FORMS +=

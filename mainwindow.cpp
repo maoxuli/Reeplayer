@@ -38,6 +38,10 @@ MainWindow::MainWindow(QWidget *parent) :
     menu_bar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     menu_bar->setFixedHeight(50);
 
+    QPushButton *connect_button = new QPushButton("Connect", menu_bar);
+    connect_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    connect_button->setFixedHeight(40);
+
     QPushButton *play_button = new QPushButton("Play", menu_bar);
     play_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     play_button->setFixedHeight(40);
@@ -47,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stop_button->setFixedHeight(40);
 
     QHBoxLayout *h_layout= new QHBoxLayout(menu_bar);
+    h_layout->addWidget(connect_button);
     h_layout->addWidget(play_button);
     h_layout->addWidget(stop_button);
     menu_bar->setLayout((h_layout));
@@ -57,9 +62,34 @@ MainWindow::MainWindow(QWidget *parent) :
     v_layout->addWidget(image_view_1);
     v_layout->addWidget(menu_bar);
     this->setLayout(v_layout);
+
+    // signal-slot
+    connect(connect_button, SIGNAL(clicked()), this, SLOT(connect()));
+    connect(&sink_pipeline, SIGNAL(received()), this, SLOT(update_frame()));
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+// connect to RTSP
+void MainWindow::connect()
+{
+    std::string pipeline_str = CreateRtspSinkPipeline("rtsp://192.168.1.188:8554/ds-stream");
+    qDebug() << pipeline_str;
+    sink_pipeline.reset(new GstAppSinkPipeline());
+    sink_pipeline->Initialize(pipeline_str);
+    sink_pipeline->SetPipelineState(GST_STATE_PLAYING);
+}
+
+// update frame from sink pipeline to image view
+void MainWindow::update_frame()
+{
+    if (sink_pipeline.CheckNewFrames() &&
+        sink_pipeline.GetFrames(buffer))
+    {
+        //QImage
+        sink_pipeline.ReleaseFrameBuffer();
+    }
 }
