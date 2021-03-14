@@ -12,21 +12,24 @@ public:
     ImageView(QWidget *parent = 0);
     ~ImageView();
 
-    // scale on current size
-    void SetScale(float s);
+    // Reset with a initial size
+    void Reset(int width = 0, int height = 0);
+    // Scale
+    void SetScale(float sx, float sy);
+    void GetScale(float &sx, float &sy);
+    // zoom by factor
+    void ZoomIn(float factor);
+    void ZoomOut(float factor);
+    // Scale to fit window
+    void FitWindow();
 
-    // display as actual size
-    // or fit to window size
-    void Reset(int width = 0, int height = 0, bool actual = false);
-
-    // update image the label text
+    // update image with the label text
     void UpdateImage(const QImage& im, const std::string& label = "");
-
-    void SetDrawingMode(bool set);
 
 signals:
 
 private slots:
+    void resizeEvent(QResizeEvent *event);
 
 private:
     QGraphicsScene _scene;

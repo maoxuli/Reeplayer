@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QPushButton>
 
 #include <memory>
 #include "GstAppSinkPipeline.h"
@@ -19,13 +20,20 @@ public:
 
 private slots:
     void connect();
-    void disconnect();
+    void play();
+    void pause();
+    void stop();
+    void zoom_in();
+    void zoom_out();
+    void actual_size();
+    void fit_window();
     void update_frame();
 
 private:
     QTimer update_timer;
     ImageView *image_view_0;
     ImageView *image_view_1;
+
     std::shared_ptr<GstAppSinkPipeline> sink_pipeline;
     bool is_streaming;
     int image_width, image_height;
