@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Reeplayer");
     QRect rc = QDesktopWidget().availableGeometry();
     qDebug() << "screen: " << rc;
-    int w = (rc.height() - 100) * 9 / 16;
+    int w = (rc.height() - 100) * 9 / 18;
     qDebug() << "w: " << w;
     QRect window_rc((rc.width() - w)/2, rc.top(), w, rc.height() - 100);
     qDebug() << "window_rc: " << window_rc;
@@ -46,36 +46,36 @@ MainWindow::MainWindow(QWidget *parent) :
     menu_bar->setFixedHeight(50);
 
     QPushButton *connect_button = new QPushButton("Connect", menu_bar);
-    connect_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    connect_button->setFixedHeight(40);
+    connect_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect_button->setFixedSize(80, 40);
 
-    QPushButton *play_button = new QPushButton("Play", menu_bar);
-    play_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    play_button->setFixedHeight(40);
+    QPushButton *play_button = new QPushButton(">", menu_bar);
+    play_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    play_button->setFixedSize(40, 40);
 
-    QPushButton *pause_button = new QPushButton("Pause", menu_bar);
-    pause_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    pause_button->setFixedHeight(40);
+    QPushButton *pause_button = new QPushButton("||", menu_bar);
+    pause_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pause_button->setFixedSize(40, 40);
 
-    QPushButton *stop_button = new QPushButton("Stop", menu_bar);
-    stop_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    stop_button->setFixedHeight(40);
+    QPushButton *stop_button = new QPushButton("X", menu_bar);
+    stop_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    stop_button->setFixedSize(40, 40);
 
     QPushButton *zoom_in_button = new QPushButton("+", menu_bar);
-    zoom_in_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    zoom_in_button->setFixedHeight(40);
+    zoom_in_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    zoom_in_button->setFixedSize(40, 40);
 
     QPushButton *actual_size_button = new QPushButton("=", menu_bar);
-    actual_size_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    actual_size_button->setFixedHeight(40);
+    actual_size_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    actual_size_button->setFixedSize(40, 40);
 
     QPushButton *zoom_out_button = new QPushButton("-", menu_bar);
-    zoom_out_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    zoom_out_button->setFixedHeight(40);
+    zoom_out_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    zoom_out_button->setFixedSize(40, 40);
 
-    QPushButton *fit_window_button = new QPushButton("#", menu_bar);
-    fit_window_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    fit_window_button->setFixedHeight(40);
+    QPushButton *fit_window_button = new QPushButton("[]", menu_bar);
+    fit_window_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    fit_window_button->setFixedSize(40, 40);
 
     qDebug() << "layout buttons";
     QHBoxLayout *h_layout= new QHBoxLayout(menu_bar);
