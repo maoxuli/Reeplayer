@@ -39,30 +39,34 @@ void ImageView::resizeEvent(QResizeEvent *event)
     QGraphicsView::resizeEvent(event);
 }
 
-void ImageView::GetScale(float &sx, float &sy)
+void ImageView::zoomIn()
 {
-    sx = transform().m11();
-    sy = transform().m22();
-}
-
-void ImageView::ZoomIn(float factor)
-{
+    float factor = 0.1;
     if (factor > 0)
         SetScale(1 + factor, 1 + factor);
 }
 
-void ImageView::ZoomOut(float factor)
+void ImageView::zoomOut()
 {
+    float factor = 0.1;
     if (factor > 0 && factor < 1)
         SetScale(1 - factor, 1- factor);
 }
 
-void ImageView::SetScale(float sx, float sy)
+// set fit window
+void ImageView::fitWindow()
 {
-    if (abs(sx - 1.0) < 0.05 && abs(sy - 1.0) < 0.05)
-        QGraphicsView::resetMatrix(); // remove cumulative error
-    else
-        QGraphicsView::scale(sx, sy);
+    int width = _im_item.pixmap().width();
+    int height = _im_item.pixmap().height();
+    if(width > 0 && height > 0)
+    {
+        fitInView(0, 0, width, height, Qt::KeepAspectRatio);
+    }
+}
+
+void ImageView::actualSize()
+{
+    SetScale(1.0, 1.0);
 }
 
 // reset to a initial size
@@ -83,16 +87,18 @@ void ImageView::Reset(int width, int height)
     _label_item.setPos(-offset.x() - 80.0, offset.y() + 10.0);
 }
 
-// set fit window
-// Todo: use fitInView(...)
-void ImageView::FitWindow()
+void ImageView::GetScale(float &sx, float &sy)
 {
-    int width = _im_item.pixmap().width();
-    int height = _im_item.pixmap().height();
-    if(width > 0 && height > 0)
-    {
-        fitInView(0, 0, width, height, Qt::KeepAspectRatio);
-    }
+    sx = transform().m11();
+    sy = transform().m22();
+}
+
+void ImageView::SetScale(float sx, float sy)
+{
+    if (abs(sx - 1.0) < 0.05 && abs(sy - 1.0) < 0.05)
+        QGraphicsView::resetMatrix(); // remove cumulative error
+    else
+        QGraphicsView::scale(sx, sy);
 }
 
 // update image,

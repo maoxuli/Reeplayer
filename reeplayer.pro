@@ -43,7 +43,10 @@ SOURCES += \
     camerasform.cpp \
     filesform.cpp \
     videosform.cpp \
-    videoview.cpp
+    videoview.cpp \
+    camerasmanager.cpp \
+    camera.cpp \
+    videostream.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -54,6 +57,9 @@ HEADERS += \
     camerasform.h \
     filesform.h \
     videosform.h \
-    videoview.h
+    videoview.h \
+    camerasmanager.h \
+    camera.h \
+    videostream.h
 
 FORMS +=

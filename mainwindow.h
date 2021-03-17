@@ -6,6 +6,8 @@
 #include <QButtonGroup>
 #include <QStackedLayout>
 
+#include "camerasmanager.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -20,6 +22,10 @@ private slots:
 private:
     QButtonGroup *button_group;
     QStackedLayout *forms_layout;
+
+    // cameras manager
+    std::string cameras_config;
+    CamerasManager *cameras;
 };
 
 #endif // MAINWINDOW_H

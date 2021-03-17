@@ -2,16 +2,20 @@
 #define CAMERASFORM_H
 
 #include <QWidget>
+#include "camerasmanager.h"
+
 
 class CamerasForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit CamerasForm(QWidget *parent = 0);
+    explicit CamerasForm(CamerasManager *manager, QWidget *parent = 0);
     ~CamerasForm();
 
 private:
+    // cameras
+    CamerasManager *cameras;
 };
 
 #endif // CAMERASFORM_H

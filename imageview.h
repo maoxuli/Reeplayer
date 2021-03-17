@@ -17,14 +17,18 @@ public:
     // Scale
     void SetScale(float sx, float sy);
     void GetScale(float &sx, float &sy);
-    // zoom by factor
-    void ZoomIn(float factor);
-    void ZoomOut(float factor);
-    // Scale to fit window
-    void FitWindow();
 
     // update image with the label text
     void UpdateImage(const QImage& im, const std::string& label = "");
+
+public slots:
+    // zoom by factor
+    void zoomIn();
+    void zoomOut();
+    // scale to fit window
+    void fitWindow();
+    // reset to actual size
+    void actualSize();
 
 signals:
 

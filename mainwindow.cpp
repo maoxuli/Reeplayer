@@ -34,12 +34,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget *center_widget = new QWidget();
     setCentralWidget(center_widget);
 
+    // cameras manager
+    cameras = new CamerasManager(cameras_config);
+    assert(cameras);
+
     // forms
     QWidget *forms[NUM_FORMS];
     assert(NUM_FORMS >= 4);
-    forms[0] = new CamerasForm();
-    forms[1] = new VideosForm();
-    forms[2] = new FilesForm();
+    forms[0] = new CamerasForm(cameras);
+    forms[1] = new VideosForm(cameras);
+    forms[2] = new FilesForm(cameras);
     forms[3] = new QWidget();
 
     // buttons
@@ -64,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
         // wrap the form with scroll area
         // and add the scroll area to the stacked layout
         QScrollArea *scroll_area = new QScrollArea();
+        scroll_area->setFrameShape(QFrame::NoFrame);
         scroll_area->setWidgetResizable(true);
         scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         scroll_area->setWidget(forms[i]);

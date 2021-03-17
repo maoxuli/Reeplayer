@@ -1,7 +1,8 @@
 #include "filesform.h"
 
-FilesForm::FilesForm(QWidget *parent) :
-    QWidget(parent)
+FilesForm::FilesForm(CamerasManager *manager, QWidget *parent) :
+    QWidget(parent),
+    cameras(manager)
 {
 
 }

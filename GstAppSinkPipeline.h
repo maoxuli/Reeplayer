@@ -11,7 +11,7 @@ public:
 
 	void Initialize(std::string pipelineString);
 
-	bool GetIsNewFrameAvailable();
+    bool IsNewFrameAvailable();
 	bool GetLatestFrameBuffer(void** frameBuffer);
 	void ReleaseFrameBuffer();
 

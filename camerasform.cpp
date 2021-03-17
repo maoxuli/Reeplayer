@@ -1,7 +1,8 @@
 #include "camerasform.h"
 
-CamerasForm::CamerasForm(QWidget *parent) :
-    QWidget(parent)
+CamerasForm::CamerasForm(CamerasManager *manager, QWidget *parent) :
+    QWidget(parent),
+    cameras(manager)
 {
 
 }
