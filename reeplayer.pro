@@ -39,13 +39,21 @@ SOURCES += \
     mainwindow.cpp \
     imageview.cpp \
     GstPipelineWrapper.cpp \
-    GstAppSinkPipeline.cpp
+    GstAppSinkPipeline.cpp \
+    camerasform.cpp \
+    filesform.cpp \
+    videosform.cpp \
+    videoview.cpp
 
 HEADERS += \
     mainwindow.h \
     imageview.h \
     GstPipelineWrapper.h \
     GstAppSinkPipeline.h \
-    GstreamerPipelines.h
+    GstreamerPipelines.h \
+    camerasform.h \
+    filesform.h \
+    videosform.h \
+    videoview.h
 
 FORMS +=

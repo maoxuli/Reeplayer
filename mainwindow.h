@@ -2,13 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTimer>
 #include <QPushButton>
-
-#include <memory>
-#include "GstAppSinkPipeline.h"
-#include "GstreamerPipelines.h"
-#include "imageview.h"
+#include <QButtonGroup>
+#include <QStackedLayout>
 
 class MainWindow : public QMainWindow
 {
@@ -19,24 +15,11 @@ public:
     ~MainWindow();
 
 private slots:
-    void connect();
-    void play();
-    void pause();
-    void stop();
-    void zoom_in();
-    void zoom_out();
-    void actual_size();
-    void fit_window();
-    void update_frame();
+    void clickedButton(QAbstractButton *button);
 
 private:
-    QTimer update_timer;
-    ImageView *image_view_0;
-    ImageView *image_view_1;
-
-    std::shared_ptr<GstAppSinkPipeline> sink_pipeline;
-    bool is_streaming;
-    int image_width, image_height;
+    QButtonGroup *button_group;
+    QStackedLayout *forms_layout;
 };
 
 #endif // MAINWINDOW_H

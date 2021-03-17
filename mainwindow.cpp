@@ -1,21 +1,26 @@
 #include "mainwindow.h"
-#include "imageview.h"
 
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QWidget>
-#include <QStatusBar>
-#include <QVBoxLayout>
+#include <QScrollArea>
+#include <QStackedLayout>
 #include <QButtonGroup>
 #include <QPushButton>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
+#include "camerasform.h"
+#include "videosform.h"
+#include "filesform.h"
+
+#define NUM_FORMS 4
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    is_streaming(false),
-    image_width(0),
-    image_height(0)
+    QMainWindow(parent)
 {
-    setWindowTitle("Reeplayer");
+    // window size (18:9)
     QRect rc = QDesktopWidget().availableGeometry();
     qDebug() << "screen: " << rc;
     int w = (rc.height() - 100) * 9 / 18;
@@ -23,187 +28,75 @@ MainWindow::MainWindow(QWidget *parent) :
     QRect window_rc((rc.width() - w)/2, rc.top(), w, rc.height() - 100);
     qDebug() << "window_rc: " << window_rc;
     setGeometry(window_rc);
+    setWindowTitle("Reeplayer");
 
     // client area
     QWidget *center_widget = new QWidget();
     setCentralWidget(center_widget);
 
-    // status bar
-    QStatusBar *status_bar = new QStatusBar(center_widget);
-    setStatusBar(status_bar);
-
-    // image view
-    image_view_0 = new ImageView(center_widget);
-    image_view_1 = new ImageView(center_widget);
-
-    //image_view_0->setStyleSheet("background-color: black");
-    //image_view_1->setStyleSheet("background-color: black");
+    // forms
+    QWidget *forms[NUM_FORMS];
+    assert(NUM_FORMS >= 4);
+    forms[0] = new CamerasForm();
+    forms[1] = new VideosForm();
+    forms[2] = new FilesForm();
+    forms[3] = new QWidget();
 
     // buttons
-    qDebug() << "create buttons";
-    QFrame *menu_bar = new QFrame(center_widget);
-    menu_bar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    menu_bar->setFixedHeight(50);
+    QPushButton *buttons[NUM_FORMS];
+    buttons[0] = new QPushButton("Cameras");
+    buttons[1] = new QPushButton("Videos");
+    buttons[2] = new QPushButton("Files");
+    buttons[3] = new QPushButton("System");
 
-    QPushButton *connect_button = new QPushButton("Connect", menu_bar);
-    connect_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect_button->setFixedSize(80, 40);
+    // layout
+    forms_layout = new QStackedLayout();
+    button_group = new QButtonGroup();
 
-    QPushButton *play_button = new QPushButton(">", menu_bar);
-    play_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    play_button->setFixedSize(40, 40);
+    QFrame *buttons_frame = new QFrame(center_widget);
+    QHBoxLayout *buttons_layout= new QHBoxLayout();
+    buttons_frame->setLayout((buttons_layout));
+    buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    buttons_frame->setFixedHeight(50);
 
-    QPushButton *pause_button = new QPushButton("||", menu_bar);
-    pause_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    pause_button->setFixedSize(40, 40);
-
-    QPushButton *stop_button = new QPushButton("X", menu_bar);
-    stop_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    stop_button->setFixedSize(40, 40);
-
-    QPushButton *zoom_in_button = new QPushButton("+", menu_bar);
-    zoom_in_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    zoom_in_button->setFixedSize(40, 40);
-
-    QPushButton *actual_size_button = new QPushButton("=", menu_bar);
-    actual_size_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    actual_size_button->setFixedSize(40, 40);
-
-    QPushButton *zoom_out_button = new QPushButton("-", menu_bar);
-    zoom_out_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    zoom_out_button->setFixedSize(40, 40);
-
-    QPushButton *fit_window_button = new QPushButton("[]", menu_bar);
-    fit_window_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    fit_window_button->setFixedSize(40, 40);
-
-    qDebug() << "layout buttons";
-    QHBoxLayout *h_layout= new QHBoxLayout(menu_bar);
-    h_layout->addWidget(connect_button);
-    h_layout->addWidget(play_button);
-    h_layout->addWidget(pause_button);
-    h_layout->addWidget(stop_button);
-    h_layout->addWidget(zoom_in_button);
-    h_layout->addWidget(actual_size_button);
-    h_layout->addWidget(zoom_out_button);
-    h_layout->addWidget(fit_window_button);
-    menu_bar->setLayout((h_layout));
+    for (int i = 0; i < NUM_FORMS; i++)
+    {
+        // wrap the form with scroll area
+        // and add the scroll area to the stacked layout
+        QScrollArea *scroll_area = new QScrollArea();
+        scroll_area->setWidgetResizable(true);
+        scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scroll_area->setWidget(forms[i]);
+        forms_layout->addWidget(scroll_area);
+        // add button to group
+        // with index as the button id
+        button_group->addButton(buttons[i], i);
+        // add button to frame
+        // so can control the height of the buttons region
+        buttons[i]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        buttons[i]->setFixedHeight(40);
+        buttons_layout->addWidget(buttons[i]);
+    }
+    forms_layout->setCurrentIndex(0);
 
     // main layout
-    qDebug() << "layout main view";
-    QVBoxLayout *v_layout = new QVBoxLayout(center_widget);
-    v_layout->addWidget(image_view_0);
-    v_layout->addWidget(image_view_1);
-    v_layout->addWidget(menu_bar);
-    center_widget->setLayout(v_layout);
+    QVBoxLayout *main_layout = new QVBoxLayout();
+    main_layout->addLayout(forms_layout);
+    main_layout->addWidget(buttons_frame);
+    center_widget->setLayout(main_layout);
 
-    // signal-slot
-    qDebug() << "connect signals";
-    QObject::connect(&update_timer, SIGNAL(timeout()), this, SLOT(update_frame()));
-    QObject::connect(connect_button, SIGNAL(clicked()), this, SLOT(connect()));
-    QObject::connect(play_button, SIGNAL(clicked()), this, SLOT(play()));
-    QObject::connect(pause_button, SIGNAL(clicked()), this, SLOT(pause()));
-    QObject::connect(stop_button, SIGNAL(clicked()), this, SLOT(stop()));
-    QObject::connect(zoom_in_button, SIGNAL(clicked()), this, SLOT(zoom_in()));
-    QObject::connect(actual_size_button, SIGNAL(clicked()), this, SLOT(actual_size()));
-    QObject::connect(zoom_out_button, SIGNAL(clicked()), this, SLOT(zoom_out()));
-    QObject::connect(fit_window_button, SIGNAL(clicked()), this, SLOT(fit_window()));
+    // signal from buttons
+    connect(button_group, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
+            this, &MainWindow::clickedButton);
 }
 
 MainWindow::~MainWindow()
 {
-    stop();
+
 }
 
-// connect to RTSP
-void MainWindow::connect()
+void MainWindow::clickedButton(QAbstractButton *button)
 {
-    qDebug() << "connecting";
-    std::string pipeline_str = CreateRtspSinkPipeline("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
-    qDebug() << pipeline_str.c_str();
-    sink_pipeline.reset(new GstAppSinkPipeline());
-    sink_pipeline->Initialize(pipeline_str);
-    sink_pipeline->SetPipelineState(GST_STATE_PLAYING);
-    update_timer.start(1000.0/30.0);
-}
-
-void MainWindow::play()
-{
-    if (sink_pipeline)
-        sink_pipeline->SetPipelineState(GST_STATE_PLAYING);
-}
-
-void MainWindow::pause()
-{
-    if (sink_pipeline)
-        sink_pipeline->SetPipelineState(GST_STATE_PAUSED);
-}
-
-void MainWindow::stop()
-{
-    qDebug() << "disconnecting";
-    update_timer.stop();
-    if (sink_pipeline)
-    {
-        sink_pipeline->SetPipelineState(GST_STATE_NULL);
-        sink_pipeline.reset();
-    }
-    is_streaming = false;
-    image_width = 0;
-    image_height = 0;
-}
-
-void MainWindow::zoom_in()
-{
-    image_view_0->ZoomIn(0.1);
-    image_view_1->ZoomIn(0.1);
-}
-
-void MainWindow::zoom_out()
-{
-    image_view_0->ZoomOut(0.1);
-    image_view_1->ZoomOut(0.1);
-}
-
-void MainWindow::actual_size()
-{
-    image_view_0->SetScale(1.0, 1.0);
-    image_view_1->SetScale(1.0, 1.0);
-}
-
-void MainWindow::fit_window()
-{
-    image_view_0->FitWindow();
-    image_view_1->FitWindow();
-}
-
-// update frame from sink pipeline to image view
-void MainWindow::update_frame()
-{
-    if (!is_streaming)
-    {
-        qDebug() << "waiting";
-        if (sink_pipeline->GetIsNewFrameAvailable() &&
-            sink_pipeline->GetResolution(&image_width, &image_height))
-        {
-            image_view_0->Reset(image_width, image_height);
-            image_view_1->Reset(image_width, image_height);
-            image_view_0->FitWindow();
-            image_view_1->FitWindow();
-            is_streaming = true;
-        }
-    }
-    else
-    {
-        //qDebug() << "streaming";
-        void* buffer;
-        if (sink_pipeline->GetIsNewFrameAvailable() &&
-            sink_pipeline->GetLatestFrameBuffer(&buffer))
-        {
-            QImage image((unsigned char*)buffer, image_width, image_height, QImage::Format_RGB888);
-            image_view_0->UpdateImage(image);
-            image_view_1->UpdateImage(image);
-            sink_pipeline->ReleaseFrameBuffer();
-        }
-    }
+    int id = button_group->id(button);
+    forms_layout->setCurrentIndex(id);
 }

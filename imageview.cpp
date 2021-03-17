@@ -8,8 +8,8 @@ ImageView::ImageView(QWidget *parent)
     : QGraphicsView(parent)
 {
     setFrameShape(QFrame::NoFrame);
-    //QBrush bk_brush = QApplication::style()->standardPalette().brush(QPalette::Background);
-    //setBackgroundBrush(bk_brush);
+    //setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
+    //setBackgroundBrush(QApplication::style()->standardPalette().brush(QPalette::Background));
     setScene(&_scene);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -77,10 +77,6 @@ void ImageView::Reset(int width, int height)
     setSceneRect(offset.x(), offset.y(), width, height);
     translate(1.0, 1.0);
     SetScale(1.0, 1.0);
-
-    float sx, sy;
-    GetScale(sx, sy);
-    qDebug() << "reset to: " << sx << "," << sy;
 
     _label_item.setPlainText("");
     _label_item.setTextWidth(70.0);

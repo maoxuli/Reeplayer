@@ -1,5 +1,5 @@
-#ifndef IMAGE_VEIW_H
-#define IMAGE_VEIW_H
+#ifndef IMAGEVEIW_H
+#define IMAGEVEIW_H
 
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
@@ -38,4 +38,4 @@ private:
     double _initial_scale;
 };
 
-#endif // ifndef IMAGE_VEIW_H
+#endif // ifndef IMAGEVEIW_H

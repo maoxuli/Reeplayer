@@ -28,8 +28,10 @@ void GstAppSinkPipeline::Initialize(std::string pipelineString)
 	appsinkCallbacks.new_sample		= &GstAppSinkPipeline::NewSampleCallback;
 	appsinkCallbacks.eos			= &GstAppSinkPipeline::EndOfStreamCallback; 
 	
-	gst_app_sink_set_drop			(GST_APP_SINK(appsink), true);
-	gst_app_sink_set_max_buffers	(GST_APP_SINK(appsink), 1);
+    //gst_base_sink_set_sync          (GST_BASE_SINK(appsink), false);
+    //gst_base_sink_set_async_enabled (GST_BASE_SINK(appsink), false);
+    //gst_app_sink_set_drop			(GST_APP_SINK(appsink), true);
+    //gst_app_sink_set_max_buffers	(GST_APP_SINK(appsink), 1);
 	//gst_app_sink_set_emit_signals	(GST_APP_SINK(appsink), true);
 	gst_app_sink_set_callbacks		(GST_APP_SINK(appsink), &appsinkCallbacks, this, (GDestroyNotify)GstAppSinkPipeline::DestroyCallback);		
 }

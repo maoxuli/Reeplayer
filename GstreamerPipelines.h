@@ -15,19 +15,13 @@ static std::string CreateRtspSinkPipeline(const std::string& url)
     pipelineString
         << "rtspsrc location=" << url
         << LINK
-        << "rtph264depay"
-        << LINK
-        << "h264parse"
-        << LINK
-        << "queue"
-        << LINK
-        << "avdec_h264"
+        << "decodebin"
         << LINK
         << "videoconvert"
         << LINK
-        << "video/x-raw,format=(string)BGR"
+        << "video/x-raw,format=(string)RGB"
         << LINK
-        << "appsink name=" << APPSINK_NAME;
+        << "appsink drop=true max-buffers=1 max-lateness=100000000 sync=false async=false name=" << APPSINK_NAME;
 
     return pipelineString.str();
 }
