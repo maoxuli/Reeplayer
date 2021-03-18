@@ -18,7 +18,7 @@
 #define NUM_FORMS 4
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QWidget(parent)
 {
     // window size (18:9)
     QRect rc = QDesktopWidget().availableGeometry();
@@ -29,10 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "window: " << window_rc;
     setGeometry(window_rc);
     setWindowTitle("Reeplayer");
-
-    // client area
-    QWidget *center_widget = new QWidget();
-    setCentralWidget(center_widget);
 
     // cameras manager
     cameras = new CamerasManager(cameras_config);
@@ -57,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     forms_layout = new QStackedLayout();
     button_group = new QButtonGroup();
 
-    QFrame *buttons_frame = new QFrame(center_widget);
+    QFrame *buttons_frame = new QFrame();
     QHBoxLayout *buttons_layout= new QHBoxLayout();
     buttons_frame->setLayout((buttons_layout));
     buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -88,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QVBoxLayout *main_layout = new QVBoxLayout();
     main_layout->addLayout(forms_layout);
     main_layout->addWidget(buttons_frame);
-    center_widget->setLayout(main_layout);
+    setLayout(main_layout);
 
     // signal from buttons
     connect(button_group, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
