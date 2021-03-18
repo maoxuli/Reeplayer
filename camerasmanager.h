@@ -29,6 +29,8 @@ public:
     Camera* GetFirstCamera();
     Camera* GetNextCamera();
 
+    int GetNextCameraID() const { return last_id + 1; }
+
 public slots:
 
 signals:

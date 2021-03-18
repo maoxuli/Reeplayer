@@ -20,7 +20,7 @@ FileState::FileState(Camera *camera, QWidget *parent) :
     // camera_name
     camera_name_label = new QLabel(camera->name().c_str());
     camera_name_label->setStyleSheet("padding-left:3px; background-color:#A9CCE3");
-    camera_name_label->setFont(QFont( "Arial", 13, QFont::Bold));
+    camera_name_label->setFont(QFont("Arial", 13, QFont::Bold));
     camera_name_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     camera_name_label->setFixedHeight(40);
 

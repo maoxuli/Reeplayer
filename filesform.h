@@ -15,6 +15,10 @@ public:
     explicit FilesForm(CamerasManager *manager, QWidget *parent = 0);
     ~FilesForm();
 
+public slots:
+    void addCamera(int id);
+    void removeCamera(int id);
+
 private:
     // cameras
     CamerasManager *cameras;

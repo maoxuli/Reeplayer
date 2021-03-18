@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QFrame>
 
+#include "formindex.h"
 #include "camerasmanager.h"
 
 class MainWindow : public QWidget
@@ -15,16 +16,6 @@ class MainWindow : public QWidget
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-    // form index in page layout
-    enum FormIndex
-    {
-        CAMERAS_FORM,
-        VIDEOS_FORM,
-        FILES_FORM,
-        SYSTEM_FORM,
-        LAST_FROM
-    };
 
 public slots:
     // the normal display is vertical screen

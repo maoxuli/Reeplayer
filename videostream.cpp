@@ -12,7 +12,6 @@ VideoStream::VideoStream(Camera *camera)
 VideoStream::~VideoStream()
 {
     assert(camera);
-    camera->stopVideo();
 }
 
 // Check video status, start video if necessary

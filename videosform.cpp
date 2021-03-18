@@ -1,5 +1,6 @@
 #include "videosform.h"
 
+#include <QDebug>
 #include <QVBoxLayout>
 #include <QResizeEvent>
 
@@ -7,16 +8,10 @@ VideosForm::VideosForm(CamerasManager *manager, QWidget *parent) :
     QWidget(parent),
     cameras(manager)
 {
-    videos_layout = new QVBoxLayout();
+    // layout for camera list
+    videos_layout = new QVBoxLayout(this);
     videos_layout->setAlignment(Qt::AlignTop);
-    setLayout(videos_layout);
 
-    // attach to cameras manager
-    // add or remove camera on signal
-    //connect(cameras, &CamerasManager::cameraAdded, this, &VideosForm::addCamera);
-    //connect(cameras, &CamerasManager::cameraRemoved, this, &VideosForm::removeCamera);
-
-    // initial list of cameras
     int width = size().width();
     int height = width * 1080 / 1920;
     Camera *camera = cameras->GetFirstCamera();
@@ -25,10 +20,14 @@ VideosForm::VideosForm(CamerasManager *manager, QWidget *parent) :
         //video_view->setStyleSheet("background-color: black");
         video_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         video_view->setFixedHeight(height);
-        videos_layout->addWidget(video_view);
         videos.insert(std::make_pair(camera->id(), video_view));
+        videos_layout->addWidget(video_view);
         camera = cameras->GetNextCamera();
     }
+
+    // attach to cameras manager
+    connect(cameras, &CamerasManager::cameraAdded, this, &VideosForm::addCamera);
+    connect(cameras, &CamerasManager::cameraRemoved, this, &VideosForm::removeCamera);
 }
 
 VideosForm::~VideosForm()
@@ -43,7 +42,6 @@ void VideosForm::resizeEvent(QResizeEvent *event)
 
     for (auto it = videos.begin(); it != videos.end(); ++it) {
         VideoView *video_view = it->second;
-        assert(video_view);
         video_view->setFixedHeight(height);
     }
 
@@ -52,6 +50,10 @@ void VideosForm::resizeEvent(QResizeEvent *event)
 
 void VideosForm::addCamera(int id)
 {
+    if (videos.find(id) != videos.end()) {
+        qDebug() << "Camera exists: " << id;
+        return;
+    }
     assert(cameras);
     Camera *camera = cameras->GetCamera(id);
     if (camera) {
@@ -61,8 +63,8 @@ void VideosForm::addCamera(int id)
         //video_view->setStyleSheet("background-color: black");
         video_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         video_view->setFixedHeight(height);
-        videos_layout->addWidget(video_view);
         videos.insert(std::make_pair(id, video_view));
+        videos_layout->addWidget(video_view);
     }
 }
 
@@ -72,7 +74,7 @@ void VideosForm::removeCamera(int id)
     if (it != videos.end()) {
         VideoView *video_view = it->second;
         videos_layout->removeWidget(video_view);
-        delete video_view;
         videos.erase(it);
+        delete video_view;
     }
 }

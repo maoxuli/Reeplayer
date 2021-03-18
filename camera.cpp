@@ -20,6 +20,7 @@ Camera::Camera(int id, const std::string& ip, const std::string& name) :
 Camera::~Camera()
 {
     delete video_stream;
+    stopVideo();
 }
 
 // Establish connection to service
@@ -31,8 +32,8 @@ void Camera::connectService()
 // Call camera API to get state
 bool Camera::updateState(std::string &state)
 {
-    qDebug() << "camera update state...";
-    qDebug() << camera_state.c_str();
+    //qDebug() << "camera update state...";
+    //qDebug() << camera_state.c_str();
     state = camera_state;
     update_time = QDateTime::currentSecsSinceEpoch();
     return true;

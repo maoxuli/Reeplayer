@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
+#include "formindex.h"
 #include "camerasmanager.h"
 #include "camerastate.h"
 
@@ -14,6 +15,17 @@ class CamerasForm : public QWidget
 public:
     explicit CamerasForm(CamerasManager *manager, QWidget *parent = 0);
     ~CamerasForm();
+
+public slots:
+    void addCamera(int id);
+    void removeCamera(int id);
+
+signals:
+    void showForm(int idx);
+
+private slots:
+    void showAddCamera();
+    void showRemoveCamera();
 
 private:
     // cameras

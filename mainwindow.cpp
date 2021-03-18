@@ -15,6 +15,9 @@
 #include "videosform.h"
 #include "filesform.h"
 
+#include "addcameraform.h"
+#include "removecameraform.h"
+
 #define NUM_FORMS 4
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -33,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 0: cameras form (wrapped in scroll area)
     CamerasForm *cameras_form = new CamerasForm(cameras);
-//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
     QScrollArea *cameras_form_area = new QScrollArea();
     cameras_form_area->setFrameShape(QFrame::NoFrame);
     cameras_form_area->setWidgetResizable(true);
@@ -70,6 +73,26 @@ MainWindow::MainWindow(QWidget *parent) :
     system_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     system_form_area->setWidget(system_form);
     page_layout->addWidget(system_form_area);
+
+    // 4: add camera form (warped in scroll area)
+    AddCameraForm *add_camera_form = new AddCameraForm(cameras);
+    connect(add_camera_form, &AddCameraForm::showForm, this, &MainWindow::showForm);
+    QScrollArea *add_camera_form_area = new QScrollArea();
+    add_camera_form_area->setFrameShape(QFrame::NoFrame);
+    add_camera_form_area->setWidgetResizable(true);
+    add_camera_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    add_camera_form_area->setWidget(add_camera_form);
+    page_layout->addWidget(add_camera_form_area);
+
+    // 5: remove camera form (warped in scroll area)
+    RemoveCameraForm *remove_camera_form = new RemoveCameraForm(cameras);
+    connect(remove_camera_form, &RemoveCameraForm::showForm, this, &MainWindow::showForm);
+    QScrollArea *remove_camera_form_area = new QScrollArea();
+    remove_camera_form_area->setFrameShape(QFrame::NoFrame);
+    remove_camera_form_area->setWidgetResizable(true);
+    remove_camera_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    remove_camera_form_area->setWidget(remove_camera_form);
+    page_layout->addWidget(remove_camera_form_area);
 
     // buttons in a frame
     QPushButton *cameras_button = new QPushButton("Cameras");
@@ -164,6 +187,7 @@ void MainWindow::showForm(int idx)
     if (idx < 0 && idx >= LAST_FROM)
         qDebug() << "Invalid form index: " << idx;
 
+    qDebug() << "show form: " << idx;
     page_layout->setCurrentIndex(idx);
 }
 

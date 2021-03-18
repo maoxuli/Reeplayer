@@ -49,7 +49,9 @@ SOURCES += \
     camera.cpp \
     videostream.cpp \
     camerastate.cpp \
-    filestate.cpp
+    filestate.cpp \
+    addcameraform.cpp \
+    removecameraform.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -65,7 +67,10 @@ HEADERS += \
     camera.h \
     videostream.h \
     camerastate.h \
-    filestate.h
+    filestate.h \
+    addcameraform.h \
+    formindex.h \
+    removecameraform.h
 
 FORMS +=
 
