@@ -33,12 +33,12 @@ FileState::FileState(Camera *camera, QWidget *parent) :
 
     // file list
     QLabel *file_name_label = new QLabel("file.mp4");
-    file_name_label->setStyleSheet("padding-left:3px; background-color: #FEF5E7");
+    file_name_label->setStyleSheet("padding-left:3px; background-color: #E8F6F3");
     file_name_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     file_name_label->setFixedHeight(40);
 
     file_state_label = new QLabel();
-    file_state_label->setStyleSheet("background-color: #FEF5E7");
+    file_state_label->setStyleSheet("background-color: #E8F6F3");
     file_state_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     file_state_label->setFixedSize(40, 40);
     file_state_label->setPixmap(QIcon(":images/gray-light.png").pixmap(25, 25));
