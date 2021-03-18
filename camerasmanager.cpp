@@ -16,7 +16,7 @@ CamerasManager::~CamerasManager()
 void CamerasManager::ClearCameras()
 {
     for (int i = 0; i < cameras.size(); i++) {
-        int camera_id = cameras[i]->GetID();
+        int camera_id = cameras[i]->id();
         delete cameras[i];
         emit cameraRemoved(camera_id);
     }
@@ -30,7 +30,7 @@ bool CamerasManager::LoadCameras(const std::string &config)
     ClearCameras();
     for (int i = 0; i < 3; i++) {
         std::string camera_ip = "192.168.1.169";
-        std::string camera_name = "Camera 1";
+        std::string camera_name = "Camera " + std::to_string(i);
         bool auto_connect = false;
         int camera_id = AddCamera(camera_ip, camera_name);
         if (auto_connect) {
@@ -54,7 +54,7 @@ void CamerasManager::RemoveCamera(int id)
 {
     auto it = cameras.begin();
     while(it != cameras.end()) {
-        if ((*it)->GetID() == id) {
+        if ((*it)->id() == id) {
             delete (*it);
             it = cameras.erase(it);
             emit cameraRemoved(id);
@@ -67,7 +67,7 @@ void CamerasManager::RemoveCamera(int id)
 Camera* CamerasManager::GetCamera(int id)
 {
     for (int i = 0; i < cameras.size(); i++) {
-        if (cameras[i]->GetID() == id)
+        if (cameras[i]->id() == id)
             return cameras[i];
     }
 }

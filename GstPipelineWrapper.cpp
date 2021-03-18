@@ -1,5 +1,6 @@
 
 #include "GstPipelineWrapper.h"
+#include <iostream>
 
 GstPipelineWrapper::GstPipelineWrapper(void)
     : is_verbose_(false)
@@ -14,6 +15,7 @@ GstPipelineWrapper::~GstPipelineWrapper(void)
 
 void GstPipelineWrapper::InitializePipelineWithString(std::string pipelineString)
 {
+    std::cout << pipelineString << std::endl;
     /// Init pipeline using string
     GError* err = 0;
     pipeline_ = gst_parse_launch(pipelineString.c_str(), &err);
@@ -178,8 +180,6 @@ void GstPipelineWrapper::WaitForEOS()
     }
 }
 
-#include <iostream>
-
 void GstPipelineWrapper::EnsureGstreamerInitialization()
 {
     if (!gst_is_initialized()) {
@@ -189,7 +189,7 @@ void GstPipelineWrapper::EnsureGstreamerInitialization()
 
 void GstPipelineWrapper::FreePipeline()
 {
-    std::cout << "free pipeline" << std::endl;
+    std::cout << "free pipeline!" << std::endl;
     gst_element_set_state(pipeline_, GST_STATE_NULL);
     gst_object_unref(bus_);
     gst_object_unref(pipeline_);

@@ -2,8 +2,10 @@
 #define CAMERASFORM_H
 
 #include <QWidget>
-#include "camerasmanager.h"
+#include <QVBoxLayout>
 
+#include "camerasmanager.h"
+#include "camerastate.h"
 
 class CamerasForm : public QWidget
 {
@@ -16,6 +18,10 @@ public:
 private:
     // cameras
     CamerasManager *cameras;
+
+    // states
+    QVBoxLayout *states_layout;
+    std::map<int, CameraState*> states;
 };
 
 #endif // CAMERASFORM_H

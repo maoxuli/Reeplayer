@@ -7,15 +7,10 @@ VideoStream::VideoStream(Camera *camera)
 {
     assert(camera);
     this->camera = camera;
-
-    update_timer = new QTimer(this);
-    connect(update_timer, &QTimer::timeout, this, &VideoStream::checkUpdate);
 }
 
 VideoStream::~VideoStream()
 {
-    delete update_timer;
-
     assert(camera);
     camera->stopVideo();
 }
@@ -28,7 +23,7 @@ void VideoStream::play()
         assert(camera);
         std::string url;
         if (camera->startVideo(url)) {
-            qDebug() << "video stream URL: " << url.c_str();
+            //qDebug() << "video stream URL: " << url.c_str();
             std::string pipeline_str = CreateRtspSinkPipeline(url);
             pipeline.reset(new GstAppSinkPipeline());
             pipeline->Initialize(pipeline_str);
@@ -37,7 +32,6 @@ void VideoStream::play()
     qDebug() << "play video stream...";
     if (pipeline) {
         pipeline->SetPipelineState(GST_STATE_PLAYING);
-        update_timer->start(1000/30.0);
     }
     emit played();
 }
@@ -57,7 +51,6 @@ void VideoStream::pause()
 void VideoStream::stop()
 {
     qDebug() << "stop video stream...";
-    update_timer->stop();
     if (pipeline) {
         pipeline->SetPipelineState(GST_STATE_NULL);
         pipeline.reset();
@@ -65,12 +58,6 @@ void VideoStream::stop()
     emit stopped();
     assert(camera);
     camera->stopVideo();
-}
-
-void VideoStream::checkUpdate()
-{
-    if (pipeline && pipeline->IsNewFrameAvailable())
-        emit updated();
 }
 
 bool VideoStream::GetResolution(int *width, int *height)

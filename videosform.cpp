@@ -13,21 +13,21 @@ VideosForm::VideosForm(CamerasManager *manager, QWidget *parent) :
 
     // attach to cameras manager
     // add or remove camera on signal
-//    connect(cameras, &CamerasManager::cameraAdded, this, &VideosForm::addCamera);
-//    connect(cameras, &CamerasManager::cameraRemoved, this, &VideosForm::removeCamera);
+    //connect(cameras, &CamerasManager::cameraAdded, this, &VideosForm::addCamera);
+    //connect(cameras, &CamerasManager::cameraRemoved, this, &VideosForm::removeCamera);
 
     // initial list of cameras
     int width = size().width();
     int height = width * 1080 / 1920;
-    Camera *camera = this->cameras->GetFirstCamera();
+    Camera *camera = cameras->GetFirstCamera();
     while (camera) {
-        VideoView * video_view = new VideoView(camera->GetVideoStream());
+        VideoView *video_view = new VideoView(camera);
         //video_view->setStyleSheet("background-color: black");
         video_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         video_view->setFixedHeight(height);
         videos_layout->addWidget(video_view);
-        videos.insert(std::make_pair(camera->GetID(), video_view));
-        camera = this->cameras->GetNextCamera();
+        videos.insert(std::make_pair(camera->id(), video_view));
+        camera = cameras->GetNextCamera();
     }
 }
 
@@ -57,7 +57,7 @@ void VideosForm::addCamera(int id)
     if (camera) {
         int width = size().width();
         int height = width * 1080 / 1920;
-        VideoView * video_view = new VideoView(camera->GetVideoStream());
+        VideoView *video_view = new VideoView(camera);
         //video_view->setStyleSheet("background-color: black");
         video_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         video_view->setFixedHeight(height);

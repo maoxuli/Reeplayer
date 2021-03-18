@@ -24,9 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QRect rc = QDesktopWidget().availableGeometry();
     qDebug() << "screen: " << rc;
     int w = (rc.height() - 100) * 9 / 18;
-    qDebug() << "w: " << w;
+    //qDebug() << "w: " << w;
     QRect window_rc((rc.width() - w)/2, rc.top(), w, rc.height() - 100);
-    qDebug() << "window_rc: " << window_rc;
+    qDebug() << "window: " << window_rc;
     setGeometry(window_rc);
     setWindowTitle("Reeplayer");
 

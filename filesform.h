@@ -2,7 +2,10 @@
 #define FILESFORM_H
 
 #include <QWidget>
+#include <QVBoxLayout>
+
 #include "camerasmanager.h"
+#include "filestate.h"
 
 class FilesForm : public QWidget
 {
@@ -15,6 +18,10 @@ public:
 private:
     // cameras
     CamerasManager *cameras;
+
+    // states
+    QVBoxLayout *states_layout;
+    std::map<int, FileState*> states;
 };
 
 #endif // FILESFORM_H

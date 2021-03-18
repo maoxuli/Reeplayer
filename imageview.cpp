@@ -8,7 +8,7 @@ ImageView::ImageView(QWidget *parent)
     : QGraphicsView(parent)
 {
     setFrameShape(QFrame::NoFrame);
-    //setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
+    setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
     //setBackgroundBrush(QApplication::style()->standardPalette().brush(QPalette::Background));
     setScene(&_scene);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -16,9 +16,9 @@ ImageView::ImageView(QWidget *parent)
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
     setDragMode(QGraphicsView::ScrollHandDrag);
 
-    _scene.addItem(&_im_item);
-    _scene.addItem(&_label_item);
-    _label_item.setDefaultTextColor(Qt::red);
+    _scene.addItem(&_image_item);
+    _scene.addItem(&_text_item);
+    _text_item.setDefaultTextColor(Qt::red);
 }
 
 ImageView::~ImageView()
@@ -26,14 +26,47 @@ ImageView::~ImageView()
 
 }
 
+// fix the problem of fitInView with a margin
+void ImageView::fitInView_fixed(const QRectF &rect, Qt::AspectRatioMode aspectRatioMode)
+{
+    if (!scene() || rect.isNull())
+        return;
+    auto unity = transform().mapRect(QRectF(0, 0, 1, 1));
+    if (unity.isEmpty())
+        return;
+    scale(1/unity.width(), 1/unity.height());
+    auto viewRect = viewport()->rect();
+    if (viewRect.isEmpty())
+        return;
+    auto sceneRect = transform().mapRect(rect);
+    if (sceneRect.isEmpty())
+        return;
+    qreal xratio = viewRect.width() / sceneRect.width();
+    qreal yratio = viewRect.height() / sceneRect.height();
+
+    // Respect the aspect ratio mode.
+    switch (aspectRatioMode) {
+    case Qt::KeepAspectRatio:
+        xratio = yratio = qMin(xratio, yratio);
+        break;
+    case Qt::KeepAspectRatioByExpanding:
+        xratio = yratio = qMax(xratio, yratio);
+        break;
+    case Qt::IgnoreAspectRatio:
+        break;
+    }
+    scale(xratio, yratio);
+    centerOn(rect.center());
+}
+
 void ImageView::resizeEvent(QResizeEvent *event)
 {
-    int width = _im_item.pixmap().width();
-    int height = _im_item.pixmap().height();
+    int width = _image_item.pixmap().width();
+    int height = _image_item.pixmap().height();
 
     if(width > 0 && height > 0)
     {
-        fitInView(0, 0, width, height, Qt::KeepAspectRatio);
+        fitInView_fixed(QRect(0, 0, width, height), Qt::KeepAspectRatio);
     }
 
     QGraphicsView::resizeEvent(event);
@@ -56,11 +89,11 @@ void ImageView::zoomOut()
 // set fit window
 void ImageView::fitWindow()
 {
-    int width = _im_item.pixmap().width();
-    int height = _im_item.pixmap().height();
+    int width = _image_item.pixmap().width();
+    int height = _image_item.pixmap().height();
     if(width > 0 && height > 0)
     {
-        fitInView(0, 0, width, height, Qt::KeepAspectRatio);
+        fitInView_fixed(QRect(0, 0, width, height), Qt::KeepAspectRatio);
     }
 }
 
@@ -74,17 +107,17 @@ void ImageView::Reset(int width, int height)
 {
     // set image and label
     QPixmap pm(width, height);
-    _im_item.setPixmap(pm);
+    _image_item.setPixmap(pm);
     QPointF offset = QPointF(-width/2.0, -height/2.0);
-    _im_item.setOffset(offset);
+    _image_item.setOffset(offset);
     _scene.setSceneRect(offset.x(), offset.y(), width, height);
     setSceneRect(offset.x(), offset.y(), width, height);
     translate(1.0, 1.0);
     SetScale(1.0, 1.0);
 
-    _label_item.setPlainText("");
-    _label_item.setTextWidth(70.0);
-    _label_item.setPos(-offset.x() - 80.0, offset.y() + 10.0);
+    _text_item.setPlainText("");
+    _text_item.setTextWidth(70.0);
+    _text_item.setPos(-offset.x() - 80.0, offset.y() + 10.0);
 }
 
 void ImageView::GetScale(float &sx, float &sy)
@@ -102,10 +135,16 @@ void ImageView::SetScale(float sx, float sy)
 }
 
 // update image,
-void ImageView::UpdateImage(const QImage& im, const std::string& label)
+void ImageView::UpdateImage(const QImage& image, const std::string& text)
 {
-    QPixmap pm = QPixmap::fromImage(im);
-    _im_item.setPixmap(pm);
-    if(!label.empty())
-        _label_item.setPlainText(label.c_str());
+    QPixmap pixmap = QPixmap::fromImage(image);
+    _image_item.setPixmap(pixmap);
+    if(!text.empty())
+        _text_item.setPlainText(text.c_str());
+}
+
+// update text
+void ImageView::UpdateText(const std::string& text)
+{
+    _text_item.setPlainText(text.c_str());
 }

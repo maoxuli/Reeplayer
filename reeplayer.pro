@@ -13,7 +13,8 @@ CONFIG += link_pkgconfig
 PKGCONFIG = \
     gstreamer-1.0 \
     gstreamer-video-1.0 \
-    gstreamer-app-1.0
+    gstreamer-app-1.0 \
+    jsoncpp
 
 DEFINES += GST_USE_UNSTABLE_API
 
@@ -46,7 +47,9 @@ SOURCES += \
     videoview.cpp \
     camerasmanager.cpp \
     camera.cpp \
-    videostream.cpp
+    videostream.cpp \
+    camerastate.cpp \
+    filestate.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -60,6 +63,13 @@ HEADERS += \
     videoview.h \
     camerasmanager.h \
     camera.h \
-    videostream.h
+    videostream.h \
+    camerastate.h \
+    filestate.h
 
 FORMS +=
+
+DISTFILES +=
+
+RESOURCES += \
+    resource.qrc

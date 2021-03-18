@@ -13,12 +13,16 @@ public:
     explicit Camera(int id, const std::string& ip, const std::string& name = "");
     ~Camera();
 
-    int GetID() const { return camera_id; }
+    int id() const { return camera_id; }
+    std::string ip() const { return camera_ip; }
+    std::string name() const { return camera_name; }
 
-    bool startVideo(std::string& url);
+    bool updateState(std::string &state);
+
+    bool startVideo(std::string &url);
     bool stopVideo();
 
-    VideoStream* GetVideoStream() const { return video_stream; }
+    VideoStream* videoStream() const { return video_stream; }
 
 public slots:
     void connectService();
@@ -31,10 +35,10 @@ private:
     int camera_id; // ID used internally
     std::string camera_ip;
     std::string camera_name;
-    std::string serial_num;
 
     // JSON-RPC interface for state and command
-
+    std::string camera_state;
+    int64_t update_time;
 
     // One video stream from one camera
     VideoStream *video_stream;

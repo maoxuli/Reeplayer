@@ -2,7 +2,9 @@
 #define IMAGEVEIW_H
 
 #include <QGraphicsView>
+#include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsTextItem>
 
 class ImageView : public QGraphicsView
 {
@@ -19,7 +21,10 @@ public:
     void GetScale(float &sx, float &sy);
 
     // update image with the label text
-    void UpdateImage(const QImage& im, const std::string& label = "");
+    void UpdateImage(const QImage& image, const std::string& text = "");
+
+    // update text label
+    void UpdateText(const std::string& text);
 
 public slots:
     // zoom by factor
@@ -36,10 +41,12 @@ private slots:
     void resizeEvent(QResizeEvent *event);
 
 private:
+    void fitInView_fixed(const QRectF &rect, Qt::AspectRatioMode aspectRatioMode);
+
+private:
     QGraphicsScene _scene;
-    QGraphicsPixmapItem _im_item;
-    QGraphicsTextItem _label_item;
-    double _initial_scale;
+    QGraphicsPixmapItem _image_item;
+    QGraphicsTextItem _text_item;
 };
 
 #endif // ifndef IMAGEVEIW_H
