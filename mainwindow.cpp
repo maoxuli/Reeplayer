@@ -20,75 +20,97 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-    // window size (18:9)
-    QRect rc = QDesktopWidget().availableGeometry();
-    qDebug() << "screen: " << rc;
-    int w = (rc.height() - 100) * 9 / 18;
-    //qDebug() << "w: " << w;
-    QRect window_rc((rc.width() - w)/2, rc.top(), w, rc.height() - 100);
-    qDebug() << "window: " << window_rc;
-    setGeometry(window_rc);
     setWindowTitle("Reeplayer");
+    setVertical();
 
     // cameras manager
-    cameras = new CamerasManager(cameras_config);
+    cameras = new CamerasManager();
     assert(cameras);
 
-    // forms
-    QWidget *forms[NUM_FORMS];
-    assert(NUM_FORMS >= 4);
-    forms[0] = new CamerasForm(cameras);
-    forms[1] = new VideosForm(cameras);
-    forms[2] = new FilesForm(cameras);
-    forms[3] = new QWidget();
+    // Add forms to page layout
+    // in the order of FormIndex
+    page_layout = new QStackedLayout();
 
-    // buttons
-    QPushButton *buttons[NUM_FORMS];
-    buttons[0] = new QPushButton("Cameras");
-    buttons[1] = new QPushButton("Videos");
-    buttons[2] = new QPushButton("Files");
-    buttons[3] = new QPushButton("System");
+    // 0: cameras form (wrapped in scroll area)
+    CamerasForm *cameras_form = new CamerasForm(cameras);
+//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+    QScrollArea *cameras_form_area = new QScrollArea();
+    cameras_form_area->setFrameShape(QFrame::NoFrame);
+    cameras_form_area->setWidgetResizable(true);
+    cameras_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    cameras_form_area->setWidget(cameras_form);
+    page_layout->addWidget(cameras_form_area);
 
-    // layout
-    forms_layout = new QStackedLayout();
-    button_group = new QButtonGroup();
+    // 1: videos form (wrapped in scroll area)
+    VideosForm *videos_form = new VideosForm(cameras);
+//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+    QScrollArea *videos_form_area = new QScrollArea();
+    videos_form_area->setFrameShape(QFrame::NoFrame);
+    videos_form_area->setWidgetResizable(true);
+    videos_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    videos_form_area->setWidget(videos_form);
+    page_layout->addWidget(videos_form_area);
 
-    QFrame *buttons_frame = new QFrame();
-    QHBoxLayout *buttons_layout= new QHBoxLayout();
-    buttons_frame->setLayout((buttons_layout));
+    // 2: files form (wrapped in scroll area)
+    FilesForm *files_form = new FilesForm(cameras);
+//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+    QScrollArea *files_form_area = new QScrollArea();
+    files_form_area->setFrameShape(QFrame::NoFrame);
+    files_form_area->setWidgetResizable(true);
+    files_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    files_form_area->setWidget(files_form);
+    page_layout->addWidget(files_form_area);
+
+    // 3: system form (wrapped in scroll area)
+    QWidget *system_form = new QWidget();
+//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+    QScrollArea *system_form_area = new QScrollArea();
+    system_form_area->setFrameShape(QFrame::NoFrame);
+    system_form_area->setWidgetResizable(true);
+    system_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    system_form_area->setWidget(system_form);
+    page_layout->addWidget(system_form_area);
+
+    // buttons in a frame
+    QPushButton *cameras_button = new QPushButton("Cameras");
+    QPushButton *videos_button = new QPushButton("Videos");
+    QPushButton *files_button = new QPushButton("Files");
+    QPushButton *system_button = new QPushButton("System");
+
+    connect(cameras_button, &QPushButton::clicked, this, &MainWindow::showCameras);
+    connect(videos_button, &QPushButton::clicked, this, &MainWindow::showVideos);
+    connect(files_button, &QPushButton::clicked, this, &MainWindow::showFiles);
+    connect(system_button, &QPushButton::clicked, this, &MainWindow::showSystem);
+
+    buttons_frame = new QFrame();
+    QHBoxLayout *buttons_layout= new QHBoxLayout(buttons_frame);
+    buttons_layout->addWidget(cameras_button);
+    buttons_layout->addWidget(videos_button);
+    buttons_layout->addWidget(files_button);
+    buttons_layout->addWidget(system_button);
+
     buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     buttons_frame->setFixedHeight(50);
 
-    for (int i = 0; i < NUM_FORMS; i++)
-    {
-        // wrap the form with scroll area
-        // and add the scroll area to the stacked layout
-        QScrollArea *scroll_area = new QScrollArea();
-        scroll_area->setFrameShape(QFrame::NoFrame);
-        scroll_area->setWidgetResizable(true);
-        scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        scroll_area->setWidget(forms[i]);
-        forms_layout->addWidget(scroll_area);
-        // add button to group
-        // with index as the button id
-        button_group->addButton(buttons[i], i);
-        // add button to frame
-        // so can control the height of the buttons region
-        buttons[i]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        buttons[i]->setFixedHeight(40);
-        buttons_layout->addWidget(buttons[i]);
-    }
-    forms_layout->setCurrentIndex(0);
+    cameras_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    cameras_button->setFixedHeight(40);
+
+    videos_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    videos_button->setFixedHeight(40);
+
+    files_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    files_button->setFixedHeight(40);
+
+    system_button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    system_button->setFixedHeight(40);
 
     // main layout
-    QVBoxLayout *main_layout = new QVBoxLayout();
-    main_layout->addLayout(forms_layout);
+    QVBoxLayout *main_layout = new QVBoxLayout(this);
+    main_layout->addLayout(page_layout);
     main_layout->addWidget(buttons_frame);
-    setLayout(main_layout);
 
-    // signal from buttons
-    connect(button_group, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-            this, &MainWindow::clickedButton);
+    // switch to the default form
+    showForm(CAMERAS_FORM);
 }
 
 MainWindow::~MainWindow()
@@ -96,8 +118,71 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::clickedButton(QAbstractButton *button)
+// vertical window, size: 9:18
+void MainWindow::setVertical()
 {
-    int id = button_group->id(button);
-    forms_layout->setCurrentIndex(id);
+    QRect rc = QDesktopWidget().availableGeometry();
+    qDebug() << "screen: " << rc;
+    int h = rc.height() - 100;
+    int w = h * 9 / 18;
+    //qDebug() << "w: " << w;
+    QRect window_rc((rc.width() - w)/2, rc.top(), w, h);
+    qDebug() << "window: " << window_rc;
+    setGeometry(window_rc);
+}
+
+// horizontal windos, size: 18:9
+void MainWindow::setHorizontal()
+{
+    QRect rc = QDesktopWidget().availableGeometry();
+    qDebug() << "screen: " << rc;
+    int w = rc.height() - 100;
+    int h = w * 9 / 18;
+    //qDebug() << "h: " << h;
+    QRect window_rc((rc.width() - w)/2, rc.top(), w, h);
+    qDebug() << "window: " << window_rc;
+    setGeometry(window_rc);
+}
+
+// the normal display is vertical screen
+// may rotate to horizontal in full screen
+void MainWindow::fullScreen(bool full, bool rotate)
+{
+    if (full) {
+        buttons_frame->hide();
+        if (rotate)
+            setHorizontal();
+    }
+    else {
+        setVertical();
+        buttons_frame->show();
+    }
+}
+
+void MainWindow::showForm(int idx)
+{
+    if (idx < 0 && idx >= LAST_FROM)
+        qDebug() << "Invalid form index: " << idx;
+
+    page_layout->setCurrentIndex(idx);
+}
+
+void MainWindow::showCameras()
+{
+    showForm(CAMERAS_FORM);
+}
+
+void MainWindow::showVideos()
+{
+    showForm(VIDEOS_FORM);
+}
+
+void MainWindow::showFiles()
+{
+    showForm(FILES_FORM);
+}
+
+void MainWindow::showSystem()
+{
+    showForm(SYSTEM_FORM);
 }
