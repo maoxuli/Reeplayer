@@ -17,11 +17,13 @@ VideosForm::VideosForm(CamerasManager *manager, QWidget *parent) :
     Camera *camera = cameras->GetFirstCamera();
     while (camera) {
         VideoView *video_view = new VideoView(camera);
+        video_view->enableControl(false);
         //video_view->setStyleSheet("background-color: black");
         video_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         video_view->setFixedHeight(height);
         videos.insert(std::make_pair(camera->id(), video_view));
         videos_layout->addWidget(video_view);
+        connect(video_view, &VideoView::tapVideo, this, &VideosForm::tapVideo);
         camera = cameras->GetNextCamera();
     }
 
@@ -33,6 +35,22 @@ VideosForm::VideosForm(CamerasManager *manager, QWidget *parent) :
 VideosForm::~VideosForm()
 {
 
+}
+
+void VideosForm::showEvent(QShowEvent *event)
+{
+    for (auto it = videos.begin(); it != videos.end(); ++it) {
+        VideoView *video_view = it->second;
+        video_view->play();
+    }
+
+    QWidget::showEvent(event);
+}
+
+void VideosForm::hideEvent(QHideEvent *event)
+{
+    // VideoVideo has done the stop in hideEvent
+    QWidget::hideEvent(event);
 }
 
 void VideosForm::resizeEvent(QResizeEvent *event)
@@ -65,6 +83,7 @@ void VideosForm::addCamera(int id)
         video_view->setFixedHeight(height);
         videos.insert(std::make_pair(id, video_view));
         videos_layout->addWidget(video_view);
+        connect(video_view, &VideoView::tapVideo, this, &VideosForm::tapVideo);
     }
 }
 
@@ -73,8 +92,18 @@ void VideosForm::removeCamera(int id)
     auto it = videos.find(id);
     if (it != videos.end()) {
         VideoView *video_view = it->second;
+        disconnect(video_view, &VideoView::tapVideo, this, &VideosForm::tapVideo);
         videos_layout->removeWidget(video_view);
         videos.erase(it);
         delete video_view;
     }
+}
+
+// single video view for camera with given ID
+void VideosForm::tapVideo(int id)
+{
+    // set current camera in cameras manager
+    cameras->SetCurrentCamera(id);
+    emit showForm(ZOOM_VIDEO_FORM);
+    emit fullScreen(true, true);
 }

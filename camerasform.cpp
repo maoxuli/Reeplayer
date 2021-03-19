@@ -1,5 +1,6 @@
 #include "camerasform.h"
 
+#include <cassert>
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QPushButton>

@@ -47,11 +47,11 @@ SOURCES += \
     videoview.cpp \
     camerasmanager.cpp \
     camera.cpp \
-    videostream.cpp \
     camerastate.cpp \
     filestate.cpp \
     addcameraform.cpp \
-    removecameraform.cpp
+    removecameraform.cpp \
+    zoomvideoform.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -65,12 +65,12 @@ HEADERS += \
     videoview.h \
     camerasmanager.h \
     camera.h \
-    videostream.h \
     camerastate.h \
     filestate.h \
     addcameraform.h \
     formindex.h \
-    removecameraform.h
+    removecameraform.h \
+    zoomvideoform.h
 
 FORMS +=
 

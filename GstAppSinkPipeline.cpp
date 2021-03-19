@@ -13,7 +13,7 @@ GstAppSinkPipeline::GstAppSinkPipeline()
 
 GstAppSinkPipeline::~GstAppSinkPipeline()
 {
-	
+
 }
 
 void GstAppSinkPipeline::Initialize(std::string pipelineString)

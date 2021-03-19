@@ -10,6 +10,7 @@ enum FormIndex
     SYSTEM_FORM,
     ADD_CAMERA_FORM,
     REMOVE_CAMERA_FORM,
+    ZOOM_VIDEO_FORM,
     LAST_FROM
 };
 

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
+#include "formindex.h"
 #include "camerasmanager.h"
 #include "videoview.h"
 #include <map>
@@ -20,8 +21,18 @@ public slots:
     void addCamera(int id);
     void removeCamera(int id);
 
+    void tapVideo(int id);
+
+signals:
+    void showForm(int idx);
+    void fullScreen(bool full, bool rotate);
+
 private slots: 
-    void resizeEvent(QResizeEvent *event);
+
+private:
+    virtual void showEvent(QShowEvent *);
+    virtual void hideEvent(QHideEvent *);
+    virtual void resizeEvent(QResizeEvent *event);
 
 private:
     // cameras

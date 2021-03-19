@@ -17,6 +17,7 @@
 
 #include "addcameraform.h"
 #include "removecameraform.h"
+#include "zoomvideoform.h"
 
 #define NUM_FORMS 4
 
@@ -46,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 1: videos form (wrapped in scroll area)
     VideosForm *videos_form = new VideosForm(cameras);
-//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+    connect(videos_form, &VideosForm::showForm, this, &MainWindow::showForm);
+    connect(videos_form, &VideosForm::fullScreen, this, &MainWindow::fullScreen);
     QScrollArea *videos_form_area = new QScrollArea();
     videos_form_area->setFrameShape(QFrame::NoFrame);
     videos_form_area->setWidgetResizable(true);
@@ -56,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 2: files form (wrapped in scroll area)
     FilesForm *files_form = new FilesForm(cameras);
-//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+//    connect(files_form, &FilesForm::showForm, this, &MainWindow::showForm);
     QScrollArea *files_form_area = new QScrollArea();
     files_form_area->setFrameShape(QFrame::NoFrame);
     files_form_area->setWidgetResizable(true);
@@ -66,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 3: system form (wrapped in scroll area)
     QWidget *system_form = new QWidget();
-//    connect(cameras_form, &CamerasForm::showForm, this, &MainWindow::showForm);
+//    connect(system_form, &SystemForm::showForm, this, &MainWindow::showForm);
     QScrollArea *system_form_area = new QScrollArea();
     system_form_area->setFrameShape(QFrame::NoFrame);
     system_form_area->setWidgetResizable(true);
@@ -93,6 +95,12 @@ MainWindow::MainWindow(QWidget *parent) :
     remove_camera_form_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     remove_camera_form_area->setWidget(remove_camera_form);
     page_layout->addWidget(remove_camera_form_area);
+
+    // 5: zoom video form
+    ZoomVideoForm *zoom_video_form = new ZoomVideoForm(cameras);
+    connect(zoom_video_form, &ZoomVideoForm::showForm, this, &MainWindow::showForm);
+    connect(zoom_video_form, &ZoomVideoForm::fullScreen, this, &MainWindow::fullScreen);
+    page_layout->addWidget(zoom_video_form);
 
     // buttons in a frame
     QPushButton *cameras_button = new QPushButton("Cameras");

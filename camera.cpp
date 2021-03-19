@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "videostream.h"
 
 #include <QDebug>
 #include <QDateTime>
@@ -14,14 +13,10 @@ Camera::Camera(int id, const std::string& ip,
     // dummy state
     update_time = 0;
     camera_state = "{\"link_state\":true,\"recording_state\":true,\"uploading_state\":false,\"battery_state\":false}";
-
-    // one video stream from one camera by default
-    video_stream = new VideoStream(this);
 }
 
 Camera::~Camera()
 {
-    delete video_stream;
     stopVideo();
 }
 

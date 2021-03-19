@@ -1,5 +1,6 @@
 #include "filesform.h"
 
+#include <cassert>
 #include <QDebug>
 #include <QVBoxLayout>
 

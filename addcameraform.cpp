@@ -1,5 +1,6 @@
 #include "addcameraform.h"
 
+#include <cassert>
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QHBoxLayout>

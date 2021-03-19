@@ -28,6 +28,9 @@ public:
     Camera* GetFirstCamera();
     Camera* GetNextCamera();
 
+    void SetCurrentCamera(int id) { current_id = id; }
+    Camera* GetCurrentCamera();
+
     int GetNextCameraID() const { return last_id + 1; }
 
 public slots:
@@ -39,6 +42,7 @@ signals:
 private:
     int last_id;
     int context_id;
+    int current_id;
     std::vector<Camera*> cameras;
     void ClearCameras();
 

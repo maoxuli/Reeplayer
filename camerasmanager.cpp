@@ -8,6 +8,7 @@
 CamerasManager::CamerasManager(const std::string& config) :
     last_id(0),
     context_id(0),
+    current_id(0),
     config_file(config)
 {
     if (config_file.empty())
@@ -119,4 +120,9 @@ Camera* CamerasManager::GetNextCamera()
 {
     context_id++;
     return cameras.size() > context_id ? cameras[context_id] : NULL;
+}
+
+Camera* CamerasManager::GetCurrentCamera()
+{
+    return GetCamera(current_id);
 }

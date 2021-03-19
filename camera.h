@@ -2,7 +2,6 @@
 #define CAMERA_H
 
 #include <QObject>
-#include "videostream.h"
 
 class VideoStream;
 class Camera : public QObject
@@ -24,8 +23,6 @@ public:
     bool startVideo(std::string &url);
     bool stopVideo();
 
-    VideoStream* videoStream() const { return video_stream; }
-
 public slots:
     void connectService();
 
@@ -42,9 +39,6 @@ private:
     // JSON-RPC interface for state and command
     std::string camera_state;
     int64_t update_time;
-
-    // One video stream from one camera
-    VideoStream *video_stream;
 };
 
 #endif // CAMERA_H
