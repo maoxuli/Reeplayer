@@ -78,6 +78,7 @@ void VideosForm::addCamera(int id)
         int width = size().width();
         int height = width * 1080 / 1920;
         VideoView *video_view = new VideoView(camera);
+        video_view->enableControl(false);
         //video_view->setStyleSheet("background-color: black");
         video_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         video_view->setFixedHeight(height);

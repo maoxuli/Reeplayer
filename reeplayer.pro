@@ -51,7 +51,8 @@ SOURCES += \
     filestate.cpp \
     addcameraform.cpp \
     removecameraform.cpp \
-    zoomvideoform.cpp
+    zoomvideoform.cpp \
+    switchbutton.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -70,7 +71,8 @@ HEADERS += \
     addcameraform.h \
     formindex.h \
     removecameraform.h \
-    zoomvideoform.h
+    zoomvideoform.h \
+    switchbutton.h
 
 FORMS +=
 
