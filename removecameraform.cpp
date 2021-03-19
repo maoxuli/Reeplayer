@@ -87,7 +87,6 @@ void RemoveCameraForm::showEvent(QShowEvent *event)
 
 void RemoveCameraForm::checkItemState(QListWidgetItem *item)
 {
-    qDebug() << "state chagned...";
     if (item->checkState() == Qt::Checked) {
         if (!item->isSelected())
             item->setSelected(true);
@@ -100,7 +99,6 @@ void RemoveCameraForm::checkItemState(QListWidgetItem *item)
 
 void RemoveCameraForm::checkItemSelection(QListWidgetItem *item)
 {
-    qDebug() << "click...";
     if (item->isSelected()) {
         if (item->checkState() != Qt::Checked)
             item->setCheckState(Qt::Checked);
@@ -113,13 +111,11 @@ void RemoveCameraForm::checkItemSelection(QListWidgetItem *item)
 
 void RemoveCameraForm::cancelTask()
 {
-    qDebug() << "cancel...";
     emit showForm(CAMERAS_FORM);
 }
 
 void RemoveCameraForm::doneTask()
 {
-    qDebug() << "done...";
     auto selected_items = camera_list->selectedItems();
     for (int i = 0; i < selected_items.count(); i++) {
         QListWidgetItem *item = selected_items[i];

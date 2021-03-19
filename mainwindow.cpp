@@ -187,7 +187,7 @@ void MainWindow::showForm(int idx)
     if (idx < 0 && idx >= LAST_FROM)
         qDebug() << "Invalid form index: " << idx;
 
-    qDebug() << "show form: " << idx;
+    //qDebug() << "show form: " << idx;
     page_layout->setCurrentIndex(idx);
 }
 

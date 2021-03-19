@@ -27,6 +27,9 @@ CamerasForm::CamerasForm(CamerasManager *manager, QWidget *parent) :
     connect(add_camera_button, &QPushButton::clicked, this, &CamerasForm::showAddCamera);
     connect(remove_camera_button, &QPushButton::clicked, this, &CamerasForm::showRemoveCamera);
 
+    add_camera_button->setStyleSheet("border: none; background-color: #A9CCE3");
+    remove_camera_button->setStyleSheet("border: none; background-color: #A9CCE3");
+
     QFrame *buttons_frame = new QFrame();
     buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     buttons_frame->setFixedHeight(50);
@@ -43,6 +46,7 @@ CamerasForm::CamerasForm(CamerasManager *manager, QWidget *parent) :
 
     // main layout
     QVBoxLayout *main_layout = new QVBoxLayout(this);
+    main_layout->setAlignment(Qt::AlignTop);
     main_layout->addLayout(states_layout);
     main_layout->addWidget(buttons_frame);
 

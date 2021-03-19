@@ -12,12 +12,11 @@ public:
     explicit CamerasManager(const std::string& config = "");
     ~CamerasManager();
 
-    // Load cameras from config file
-    bool LoadCameras(const std::string& config);
-
     // Add a new camera, return the ID of the new camera
     // return 0 or negative number for failures
-    int AddCamera(const std::string& ip, const std::string& name = "");
+    int AddCamera(const std::string& ip,
+                  const std::string& name = "",
+                  bool auto_connect = false);
 
     // Remove a camera with given ID
     void RemoveCamera(int id);
@@ -41,8 +40,11 @@ private:
     int last_id;
     int context_id;
     std::vector<Camera*> cameras;
-
     void ClearCameras();
+
+    std::string config_file;
+    bool LoadCameras();
+    bool SaveCameras();
 };
 
 #endif // CAMERASMANAGER_H

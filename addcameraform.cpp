@@ -95,13 +95,11 @@ void AddCameraForm::showEvent(QShowEvent *event)
 
 void AddCameraForm::cancelTask()
 {
-    qDebug() << "cancel...";
     emit showForm(CAMERAS_FORM);
 }
 
 void AddCameraForm::doneTask()
 {
-    qDebug() << "done...";
     std::string camera_name = camera_name_edit->toPlainText().toStdString();
     std::string camera_ip = camera_ip_edit->toPlainText().toStdString();
     assert(cameras);

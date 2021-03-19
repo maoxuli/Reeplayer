@@ -4,10 +4,12 @@
 #include <QDebug>
 #include <QDateTime>
 
-Camera::Camera(int id, const std::string& ip, const std::string& name) :
+Camera::Camera(int id, const std::string& ip,
+               const std::string& name, bool is_auto) :
     camera_id(id),
     camera_ip(ip),
-    camera_name(name)
+    camera_name(name),
+    auto_connect(is_auto)
 {
     // dummy state
     update_time = 0;
