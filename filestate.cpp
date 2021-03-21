@@ -82,7 +82,7 @@ void FileState::updateState()
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
     std::string state;
-    if (camera->updateState(state)) {
+    if (camera->checkState(state)) {
         // parse json string
         Json::Reader reader;
         Json::Value root;

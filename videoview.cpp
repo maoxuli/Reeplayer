@@ -172,7 +172,7 @@ void VideoView::play()
     if (!pipeline) {
         assert(camera);
         std::string url;
-        if (camera->startVideo(url)) {
+        if (camera->startStreaming(url)) {
             std::string pipeline_str = CreateRtspSinkPipeline(url);
             pipeline.reset(new GstAppSinkPipeline());
             //pipeline->set_is_verbose(true);
@@ -201,11 +201,11 @@ void VideoView::stop()
     if (pipeline) {
         pipeline->SetPipelineState(GST_STATE_NULL);
         pipeline.reset();
+        camera->stopStreaming();
     }
     video_width = 0;
     video_height = 0;
     Reset();
-    camera->stopVideo();
 }
 
 // timing update video
@@ -234,7 +234,7 @@ void VideoView::updateState()
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
     std::string state;
-    if (camera->updateState(state)) {
+    if (camera->checkState(state)) {
         // parse json string
         Json::Reader reader;
         Json::Value root;

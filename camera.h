@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+#include "cameraclient.h"
+#include <jsonrpccpp/client/connectors/httpclient.h>
+
 class VideoStream;
 class Camera : public QObject
 {
@@ -18,27 +21,36 @@ public:
     std::string name() const { return camera_name; }
     bool is_auto() const { return auto_connect; }
 
-    bool updateState(std::string &state);
+    bool restart();
+    bool shutdown();
 
-    bool startVideo(std::string &url);
-    bool stopVideo();
+    bool checkState(std::string &state);
+    bool checkFiles(std::string &files);
+
+    bool startStreaming(std::string &url);
+    bool stopStreaming();
+
+    bool startRecording();
+    bool stopRecording();
+
+    bool startUploading();
+    bool stopUploading();
 
 public slots:
     void connectService();
 
 signals:
 
-
 private:
-    // Config
+    // config
     int camera_id; // ID used internally
     std::string camera_ip;
     std::string camera_name;
     bool auto_connect;
 
-    // JSON-RPC interface for state and command
-    std::string camera_state;
-    int64_t update_time;
+    // json rpc
+    jsonrpc::HttpClient http_client;
+    CameraClient camera_client;
 };
 
 #endif // CAMERA_H

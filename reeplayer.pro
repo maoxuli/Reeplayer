@@ -18,7 +18,7 @@ PKGCONFIG = \
 
 DEFINES += GST_USE_UNSTABLE_API
 
-LIBS += -lboost_thread -lboost_system
+LIBS += -lboost_thread -lboost_system -ljsonrpccpp-common -ljsonrpccpp-client
 
 TARGET = reeplayer
 TEMPLATE = app
@@ -72,7 +72,8 @@ HEADERS += \
     formindex.h \
     removecameraform.h \
     zoomvideoform.h \
-    switchbutton.h
+    switchbutton.h \
+    cameraclient.h
 
 FORMS +=
 

@@ -1,54 +1,96 @@
 #include "camera.h"
+#include "cameraclient.h"
 
 #include <QDebug>
 #include <QDateTime>
+
+using namespace jsonrpc;
 
 Camera::Camera(int id, const std::string& ip,
                const std::string& name, bool is_auto) :
     camera_id(id),
     camera_ip(ip),
     camera_name(name),
-    auto_connect(is_auto)
+    auto_connect(is_auto),
+    http_client("http://" + ip + ":8080"),
+    camera_client(http_client, JSONRPC_CLIENT_V2) // json-rpc 2.0
 {
-    // dummy state
-    update_time = 0;
-    camera_state = "{\"link_state\":true,\"recording_state\":true,\"uploading_state\":false,\"battery_state\":false}";
+    qDebug("Camera contructed");
+    if (auto_connect)
+        connectService();
 }
 
 Camera::~Camera()
 {
-    stopVideo();
+    stopStreaming();
 }
 
-// Establish connection to service
+bool Camera::restart()
+{
+
+}
+
+bool Camera::shutdown()
+{
+    return true;
+}
+
+// start pulling with timer
 void Camera::connectService()
 {
 
 }
 
-// Call camera API to get state
-bool Camera::updateState(std::string &state)
+// call camera API to get state
+bool Camera::checkState(std::string &state)
 {
-    //qDebug() << "camera update state...";
-    //qDebug() << camera_state.c_str();
-    state = camera_state;
-    update_time = QDateTime::currentSecsSinceEpoch();
-    return true;
+    try {
+        //Json::Value json_state = camera_client.checkState();
+        state = "{\"link_state\":true,\"recording_state\":true,\"uploading_state\":false,\"battery_state\":false}";
+        return true;
+    }
+    catch (JsonRpcException &ex) {
+      qDebug() << ex.what();
+    }
+    return false;
 }
 
-// Call camera API to start streaming, return stream URL
-bool Camera::startVideo(std::string &url)
+bool Camera::checkFiles(std::string &files)
 {
-    qDebug() << "camera start video...";
-    url = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
-    //url = "rtsp://192.168.1.190:8554/ds-stream";
-    qDebug() << url.c_str();
-    return true;
+    try {
+        //Json::Value json_files = camera_client.checkFiles("");
+        return true;
+    }
+    catch (JsonRpcException &ex) {
+      qDebug() << ex.what();
+    }
+    return false;
 }
 
-// 3. Call camera API to stop video streaming
-bool Camera::stopVideo()
+// call camera API to start streaming, return stream URL
+bool Camera::startStreaming(std::string &url)
 {
-    qDebug() << "camera stop video...";
-    return true;
+    try {
+        url = camera_client.startStreaming();
+        url = "rtsp://192.168.1.190:8554/ds-stream";
+        //url = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+        return true;
+    }
+    catch (JsonRpcException &ex) {
+      qDebug() << ex.what();
+    }
+    return false;
+}
+
+// call camera API to stop video streaming
+bool Camera::stopStreaming()
+{
+    try {
+        camera_client.stopStreaming();
+        return true;
+    }
+    catch (JsonRpcException &ex) {
+      qDebug() << ex.what();
+    }
+    return false;
 }
