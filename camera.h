@@ -12,8 +12,8 @@ class Camera : public QObject
     Q_OBJECT
 
 public:
-    explicit Camera(int id, const std::string& ip,
-                    const std::string& name = "", bool is_auto = false);
+    explicit Camera(int id, const std::string &ip,
+                    const std::string &name = "", bool is_auto = false);
     ~Camera();
 
     int id() const { return camera_id; }
@@ -21,13 +21,29 @@ public:
     std::string name() const { return camera_name; }
     bool is_auto() const { return auto_connect; }
 
+    std::string stream_url() const;
+
     bool restart();
     bool shutdown();
+    bool changeMode(int mode);
 
-    bool checkState(std::string &state);
-    bool checkFiles(std::string &files);
+    struct State
+    {
+        int mode;
+        bool streaming;
+        bool recording;
+        bool uploading;
+        float battery;
+        float temperature;
+        std::string folder;
+    };
 
-    bool startStreaming(std::string &url);
+    bool checkState(State &state);
+
+    bool resetCalib();
+    bool saveCalib();
+
+    bool startStreaming();
     bool stopStreaming();
 
     bool startRecording();
@@ -35,6 +51,38 @@ public:
 
     bool startUploading();
     bool stopUploading();
+
+    bool createFolder(const std::string &folder);
+    bool changeFolder(const std::string &folder);
+
+    struct Folder
+    {
+        std::string name;
+        Folder(const std::string& folder_name) : name(folder_name) {}
+    };
+
+    bool checkFolders(std::vector<Folder> &folders);
+
+    struct File
+    {
+        std::string name;
+        uint64_t size;
+        float uploading;
+        File(const std::string& file_name, uint64_t file_size, float file_uploading)
+            : name(file_name), size(file_size), uploading(file_uploading) {}
+    };
+
+    bool checkFiles(std::vector<File> &files, const std::string &folder = "");
+
+    struct Corner
+    {
+       int x;
+       int y;
+       Corner(int corner_x, int corner_y) : x(corner_x), y(corner_y) {}
+    };
+
+    bool setFieldCorners(const std::vector<Corner> &corners);
+    bool fieldCorners(std::vector<Corner> &corners);
 
 public slots:
     void connectService();

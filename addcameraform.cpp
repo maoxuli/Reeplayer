@@ -75,9 +75,10 @@ AddCameraForm::AddCameraForm(CamerasManager *manager, QWidget *parent) :
 
     // main layout
     QVBoxLayout *main_layout = new QVBoxLayout(this);
+    main_layout->setAlignment(Qt::AlignTop);
     main_layout->addWidget(buttons_frame);
     main_layout->addLayout(grid_layout);
-    main_layout->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Preferred, QSizePolicy::Expanding));
+    //main_layout->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Preferred, QSizePolicy::Expanding));
 }
 
 AddCameraForm::~AddCameraForm()

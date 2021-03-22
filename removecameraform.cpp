@@ -56,6 +56,7 @@ RemoveCameraForm::RemoveCameraForm(CamerasManager *manager, QWidget *parent) :
 
     // main layout
     QVBoxLayout *main_layout = new QVBoxLayout(this);
+    main_layout->setAlignment(Qt::AlignTop);
     main_layout->addWidget(buttons_frame);
     main_layout->addWidget(info_label);
     main_layout->addWidget(camera_list);

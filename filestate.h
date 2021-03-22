@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QTimer>
 
+#include "clickablelabel.h"
 #include "camera.h"
 
 class FileState : public QWidget
@@ -16,6 +17,7 @@ public:
     ~FileState();
 
 private slots:
+    void uploading();
     void updateState();
 
 private:
@@ -28,7 +30,7 @@ private:
 
     // update state
     QLabel *camera_name_label;
-    QLabel *camera_state_label;
+    ClickableLabel *camera_state_label;
     QLabel *file_state_label;
     QTimer *update_timer;
 };

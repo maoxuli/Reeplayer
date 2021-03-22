@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QTimer>
 
+#include "clickablelabel.h"
 #include "imageview.h"
 #include "camera.h"
 
@@ -33,13 +34,18 @@ signals:
     void tapVideo(int id);
 
 private slots:
+    void recording();
+    void streaming();
     void updateFrame();
     void updateState();
+
+    void resetCalib();
+    void saveCalib();
 
 private:
     virtual void showEvent(QShowEvent *);
     virtual void hideEvent(QHideEvent *);
-    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
 private:
     // camera
@@ -48,7 +54,8 @@ private:
     // controls
     QFrame *header_frame;
     QLabel *camera_name_label;
-    QLabel *camera_state_label;
+    ClickableLabel *recording_state_label;
+    ClickableLabel *streaming_state_label;
 
     QFrame *buttons_frame;
     QPushButton *play_button;
@@ -58,6 +65,9 @@ private:
     QPushButton *zoom_out_button;
     QPushButton *actual_size_button;
     QPushButton *fit_window_button;
+
+    QPushButton *reset_calib_button;
+    QPushButton *save_calib_button;
 
     // update timer
     QTimer *video_timer;

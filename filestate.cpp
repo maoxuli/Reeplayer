@@ -26,7 +26,7 @@ FileState::FileState(Camera *camera, QWidget *parent) :
     camera_name_label->setFixedHeight(40);
 
     // link_state
-    camera_state_label = new QLabel();
+    camera_state_label = new ClickableLabel();
     camera_state_label->setStyleSheet("background-color: #A9CCE3");
     camera_state_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     camera_state_label->setFixedSize(40, 40);
@@ -56,6 +56,8 @@ FileState::FileState(Camera *camera, QWidget *parent) :
     state_grid->addItem(spacer, 4, 0, 1, 2);
     setLayout(state_grid);
 
+    connect(camera_state_label, &ClickableLabel::clicked, this, &FileState::uploading);
+
     update_timer = new QTimer(this);
     connect(update_timer, &QTimer::timeout, this, &FileState::updateState);
 }
@@ -67,6 +69,7 @@ FileState::~FileState()
 
 void FileState::showEvent(QShowEvent *event)
 {
+    updateState();
     update_timer->start(1000);
     QWidget::showEvent(event);
 }
@@ -77,27 +80,34 @@ void FileState::hideEvent(QHideEvent *event)
     QWidget::hideEvent(event);
 }
 
+void FileState::uploading()
+{
+    assert(camera);
+    Camera::State state;
+    if (camera->checkState(state)) {
+        bool uploading_state = state.uploading;
+        if (uploading_state)
+            camera->stopUploading();
+        else
+            camera->startUploading();
+    }
+}
+
 void FileState::updateState()
 {
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
-    std::string state;
+    Camera::State state;
     if (camera->checkState(state)) {
-        // parse json string
-        Json::Reader reader;
-        Json::Value root;
-        std::string image;
-        if (reader.parse(state, root)) {
-            // link and uploading state
-            bool link_state = root["link_state"].asBool();
-            bool uploading_state = root["uploading_state"].asBool();
-            if (!link_state)
-                image = ":images/yellow-light.png";
-            else if (uploading_state)
-                image = ":images/green-light.png";
-            else
-                image = ":images/gray-light.png";
-            camera_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
-        }
+        bool uploading_state = state.uploading;
+        std::string image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
+        camera_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+        // files
+
+    }
+    else {
+        bool link_state = false;
+        std::string image = link_state ? ":images/green-light.png" : ":images/yellow-light.png";
+        camera_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
     }
 }

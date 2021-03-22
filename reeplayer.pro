@@ -52,7 +52,9 @@ SOURCES += \
     addcameraform.cpp \
     removecameraform.cpp \
     zoomvideoform.cpp \
-    switchbutton.cpp
+    switchbutton.cpp \
+    systemform.cpp \
+    clickablelabel.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -73,7 +75,9 @@ HEADERS += \
     removecameraform.h \
     zoomvideoform.h \
     switchbutton.h \
-    cameraclient.h
+    cameraclient.h \
+    systemform.h \
+    clickablelabel.h
 
 FORMS +=
 

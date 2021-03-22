@@ -14,6 +14,7 @@
 #include "camerasform.h"
 #include "videosform.h"
 #include "filesform.h"
+#include "systemform.h"
 
 #include "addcameraform.h"
 #include "removecameraform.h"
@@ -67,8 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
     page_layout->addWidget(files_form_area);
 
     // 3: system form (wrapped in scroll area)
-    QWidget *system_form = new QWidget();
-//    connect(system_form, &SystemForm::showForm, this, &MainWindow::showForm);
+    SystemForm *system_form = new SystemForm(cameras);
+    connect(system_form, &SystemForm::showForm, this, &MainWindow::showForm);
     QScrollArea *system_form_area = new QScrollArea();
     system_form_area->setFrameShape(QFrame::NoFrame);
     system_form_area->setWidgetResizable(true);
@@ -179,6 +180,7 @@ void MainWindow::setHorizontal()
 // may rotate to horizontal in full screen
 void MainWindow::fullScreen(bool full, bool rotate)
 {
+    showNormal();
     if (full) {
         buttons_frame->hide();
         if (rotate)
