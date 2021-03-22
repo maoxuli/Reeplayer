@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QResizeEvent>
+#include <cassert>
 
 VideosForm::VideosForm(CamerasManager *manager, QWidget *parent) :
     QWidget(parent),

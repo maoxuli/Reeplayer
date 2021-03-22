@@ -19,6 +19,7 @@
 #include "addcameraform.h"
 #include "removecameraform.h"
 #include "zoomvideoform.h"
+#include <cassert>
 
 #define NUM_FORMS 4
 

@@ -1,6 +1,7 @@
 #include "videoview.h"
 #include <json/json.h>
 
+#include <cassert>
 #include <QDebug>
 #include <QLabel>
 #include <QPushButton>

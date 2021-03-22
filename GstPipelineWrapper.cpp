@@ -2,6 +2,7 @@
 #include "GstPipelineWrapper.h"
 #include <iostream>
 #include <cassert>
+#include <functional>
 
 GstPipelineWrapper::GstPipelineWrapper(void)
     : is_verbose_(false)

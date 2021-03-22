@@ -1,5 +1,6 @@
 #include "zoomvideoform.h"
 
+#include <cassert>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QResizeEvent>

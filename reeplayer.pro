@@ -14,7 +14,7 @@ QT_CONFIG -= no-pkg-config
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += jsoncpp hiredis libjsonrpccpp-common libjsonrpccpp-client
 
-unit:!macx {
+unix:!macx {
     PKGCONFIG += gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0
     DEFINES += GST_USE_UNSTABLE_API
 }
