@@ -1,6 +1,7 @@
 
 #include "GstPipelineWrapper.h"
 #include <iostream>
+#include <cassert>
 
 GstPipelineWrapper::GstPipelineWrapper(void)
     : is_verbose_(false)
@@ -11,6 +12,7 @@ GstPipelineWrapper::GstPipelineWrapper(void)
 GstPipelineWrapper::~GstPipelineWrapper(void)
 {
     FreePipeline();
+    g_main_loop_thread_.join();
 }
 
 void GstPipelineWrapper::InitializePipelineWithString(std::string pipelineString)
@@ -25,7 +27,7 @@ void GstPipelineWrapper::InitializePipelineWithString(std::string pipelineString
     gst_bus_add_watch(bus_, (GstBusFunc)GstPipelineWrapper::GstMessageParser, this);
 
     /// Run the main loop to receive messages from bus
-    g_main_loop_thread_ = boost::thread(&GstPipelineWrapper::RunningMainLoop, this);
+    g_main_loop_thread_ = std::thread(std::bind(&GstPipelineWrapper::RunningMainLoop, this));
 }
 
 GstElement* GstPipelineWrapper::GetElementByName(std::string element_name)
@@ -54,8 +56,8 @@ GstState GstPipelineWrapper::GetPipelineState()
 
 void GstPipelineWrapper::RunningMainLoop()
 {
-    GMainLoop* loop = g_main_loop_new(NULL, FALSE);
-    g_main_loop_run(loop);
+    g_main_loop_ = g_main_loop_new(NULL, FALSE);
+    g_main_loop_run(g_main_loop_);
 }
 
 bool GstPipelineWrapper::GstMessageParser(GstBus* bus, GstMessage* msg, GstPipelineWrapper* pipeline)
@@ -191,6 +193,7 @@ void GstPipelineWrapper::FreePipeline()
 {
     std::cout << "free pipeline!" << std::endl;
     gst_element_set_state(pipeline_, GST_STATE_NULL);
+    g_main_loop_quit(g_main_loop_);
     gst_object_unref(bus_);
     gst_object_unref(pipeline_);
 }

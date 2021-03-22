@@ -49,7 +49,7 @@ bool CamerasManager::SaveCameras()
 
     std::ofstream f(config_file);
     if (!f.is_open()) {
-        std::cerr << "Failed open file: " << config_file << std::endl;
+        std::cerr << "Failed open file for write: " << config_file << std::endl;
         return false;
     }
     f << root << std::endl;
@@ -61,7 +61,7 @@ bool CamerasManager::LoadCameras()
     //ClearCameras();
     std::ifstream f(config_file);
     if (!f.is_open()) {
-        std::cerr << "Failed open file: " << config_file << std::endl;
+        std::cerr << "Failed open file for read: " << config_file << std::endl;
         return false;
     }
     Json::Value root, camera_array;

@@ -8,17 +8,22 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+#CONFIG += c++11
 QT_CONFIG -= no-pkg-config
-CONFIG += link_pkgconfig
-PKGCONFIG = \
-    gstreamer-1.0 \
-    gstreamer-video-1.0 \
-    gstreamer-app-1.0 \
-    jsoncpp
 
-DEFINES += GST_USE_UNSTABLE_API
+unix: CONFIG += link_pkgconfig
+unix: PKGCONFIG += jsoncpp hiredis libjsonrpccpp-common libjsonrpccpp-client
 
-LIBS += -lboost_thread -lboost_system -ljsonrpccpp-common -ljsonrpccpp-client
+unit:!macx {
+    PKGCONFIG += gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0
+    DEFINES += GST_USE_UNSTABLE_API
+}
+
+macx: {
+    INCLUDEPATH += "/Library/Frameworks/GStreamer.framework/Headers"
+    LIBS += -F/Library/Frameworks/ -framework GStreamer
+}
+
 
 TARGET = reeplayer
 TEMPLATE = app

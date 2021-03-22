@@ -1,9 +1,7 @@
 #pragma once
 
 #include <string>
-
-#include <boost/thread.hpp>
-#include <boost/thread/lock_guard.hpp>
+#include <thread>
 #include <gst/gst.h>
 
 class GstPipelineWrapper
@@ -28,8 +26,9 @@ protected:
 
     GstElement* pipeline_;
     GstBus* bus_;
+    GMainLoop* g_main_loop_;
 
-    boost::thread g_main_loop_thread_;
+    std::thread g_main_loop_thread_;
     void RunningMainLoop();
 
     void FreePipeline();

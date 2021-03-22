@@ -1,8 +1,8 @@
 #include "GstAppSinkPipeline.h"
 #include "GstreamerPipelines.h"
 
-#include <boost/thread/lock_guard.hpp>
 #include <iostream>
+#include <cassert>
 
 GstAppSinkPipeline::GstAppSinkPipeline()
 : retrievedBuffer(0)
@@ -64,7 +64,7 @@ void GstAppSinkPipeline::ReceiveNewSample()
 {	
 	GstSample* sample = gst_app_sink_pull_sample(GST_APP_SINK(appsink));
     if (sample) {
-		boost::lock_guard<boost::mutex> guard(bufferMutex);
+        std::lock_guard<std::mutex> guard(bufferMutex);
         if (currentBuffer != 0) { // release if not empty
 			//std::cout << "DROP!\n";
 			gst_sample_unref(currentBuffer);
@@ -75,7 +75,7 @@ void GstAppSinkPipeline::ReceiveNewSample()
 
 bool GstAppSinkPipeline::IsNewFrameAvailable()
 {
-	boost::lock_guard<boost::mutex> guard(bufferMutex);
+    std::lock_guard<std::mutex> guard(bufferMutex);
     return (currentBuffer != 0);
 }
 
@@ -89,7 +89,7 @@ bool GstAppSinkPipeline::GetLatestFrameBuffer(void** frameBuffer)
     assert(!retrievedBuffer);
 
     {
-        boost::lock_guard<boost::mutex> guard(bufferMutex);
+        std::lock_guard<std::mutex> guard(bufferMutex);
         if (!frameBuffer) {
             return (currentBuffer != 0);
         }
@@ -126,7 +126,7 @@ bool GstAppSinkPipeline::GetResolution(int* width, int* height)
 {
     *width = 0;
     *height = 0;
-    boost::lock_guard<boost::mutex> guard(bufferMutex);
+    std::lock_guard<std::mutex> guard(bufferMutex);
     if (currentBuffer) {
         GstCaps *caps = gst_sample_get_caps(currentBuffer);
         GstStructure *s = gst_caps_get_structure(caps, 0);

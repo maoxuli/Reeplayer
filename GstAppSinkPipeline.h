@@ -2,6 +2,7 @@
 
 #include <gst/app/gstappsink.h>
 #include "GstPipelineWrapper.h"
+#include <mutex>
 
 class GstAppSinkPipeline : public GstPipelineWrapper
 {
@@ -20,7 +21,7 @@ public:
 private:
 	GstElement* 	appsink;
 
-	boost::mutex	bufferMutex;
+    std::mutex      bufferMutex;
 	void			ReceiveNewSample();
 	GstSample*		retrievedBuffer;
 	GstSample*		currentBuffer;
