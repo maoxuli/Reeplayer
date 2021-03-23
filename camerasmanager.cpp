@@ -5,14 +5,37 @@
 
 #include <QDebug>
 
+#if defined(__APPLE__) && defined(__MACH__)
+#include "CoreFoundation/CoreFoundation.h"
+std::string GetBundlePath()
+{
+    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    CFURLRef resourcesURL = CFBundleCopyBundleURL(mainBundle);
+    CFStringRef cfStr = CFURLCopyFileSystemPath(resourcesURL, kCFURLPOSIXPathStyle);
+    CFRelease(resourcesURL);
+    char bundlePathStr[PATH_MAX];
+    CFStringGetCString(cfStr, bundlePathStr, FILENAME_MAX, kCFStringEncodingASCII);
+    CFRelease(cfStr);
+    return std::string(bundlePathStr);
+}
+#endif
+
 CamerasManager::CamerasManager(const std::string& config) :
     last_id(0),
     context_id(0),
     current_id(0),
     config_file(config)
 {
-    if (config_file.empty())
-        config_file = "cameras.json";
+    if (config_file.empty()) {
+#if defined(__APPLE__) && defined(__MACH__)
+        std::string bundle_path = GetBundlePath();
+        config_file = bundle_path.substr(0, bundle_path.rfind("/"));
+        config_file += "/Reeplayer.json";
+#else
+        config_file = "Reeplayer.json";
+#endif
+    }
+    qDebug() << "Config file: " << config_file.c_str();
     LoadCameras();
 }
 
@@ -108,6 +131,7 @@ Camera* CamerasManager::GetCamera(int id)
         if (cameras[i]->id() == id)
             return cameras[i];
     }
+    return NULL;
 }
 
 Camera* CamerasManager::GetFirstCamera()

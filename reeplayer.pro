@@ -22,10 +22,11 @@ unix:!macx {
 macx: {
     INCLUDEPATH += "/Library/Frameworks/GStreamer.framework/Headers"
     LIBS += -F/Library/Frameworks/ -framework GStreamer
+    LIBS += -framework CoreFoundation
 }
 
 
-TARGET = reeplayer
+TARGET = Reeplayer
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use

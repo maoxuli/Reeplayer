@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "cameraclient.h"
+#include <jsonrpccpp/client.h>
 #include <jsonrpccpp/client/connectors/httpclient.h>
 
 class VideoStream;

@@ -28,18 +28,18 @@ CamerasForm::CamerasForm(CamerasManager *manager, QWidget *parent) :
     connect(add_camera_button, &QPushButton::clicked, this, &CamerasForm::showAddCamera);
     connect(remove_camera_button, &QPushButton::clicked, this, &CamerasForm::showRemoveCamera);
 
-    add_camera_button->setStyleSheet("border: none; background-color: #A9CCE3");
-    remove_camera_button->setStyleSheet("border: none; background-color: #A9CCE3");
+    //add_camera_button->setStyleSheet("border: none; background-color: #A9CCE3");
+    //remove_camera_button->setStyleSheet("border: none; background-color: #A9CCE3");
 
     QFrame *buttons_frame = new QFrame();
     buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     buttons_frame->setFixedHeight(50);
 
     add_camera_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    add_camera_button->setFixedSize(150, 40);
+    add_camera_button->setFixedSize(150, 30);
 
     remove_camera_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    remove_camera_button->setFixedSize(150, 40);
+    remove_camera_button->setFixedSize(150, 30);
 
     QHBoxLayout *buttons_layout = new QHBoxLayout(buttons_frame);
     buttons_layout->addWidget(add_camera_button);

@@ -33,7 +33,7 @@ AddCameraForm::AddCameraForm(CamerasManager *manager, QWidget *parent) :
     buttons_layout->addWidget(done_button);
 
     buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    buttons_frame->setFixedHeight(60);
+    buttons_frame->setFixedHeight(50);
 
     cancel_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     cancel_button->setFixedSize(70, 40);

@@ -139,6 +139,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // main layout
     QVBoxLayout *main_layout = new QVBoxLayout(this);
+    main_layout->setMargin(5);
+    main_layout->setSpacing(0);
     main_layout->addLayout(page_layout);
     main_layout->addWidget(buttons_frame);
 

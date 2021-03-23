@@ -33,7 +33,7 @@ SystemForm::SystemForm(CamerasManager *manager, QWidget *parent) :
     cameras_layout->addWidget(cameras_box);
 
     main_layout->addLayout(cameras_layout);
-    main_layout->addSpacerItem(new QSpacerItem(30, 30, QSizePolicy::Preferred, QSizePolicy::Fixed));
+    main_layout->addSpacerItem(new QSpacerItem(30, 10, QSizePolicy::Preferred, QSizePolicy::Fixed));
 
     // camera's working mode
     QLabel *mode_label = new QLabel("Camera's working mode:");
@@ -67,7 +67,7 @@ SystemForm::SystemForm(CamerasManager *manager, QWidget *parent) :
     mode_layout->addWidget(apply_mode_button, 0, Qt::AlignCenter);
 
     main_layout->addLayout(mode_layout);
-    main_layout->addSpacerItem(new QSpacerItem(30, 30, QSizePolicy::Preferred, QSizePolicy::Fixed));
+    main_layout->addSpacerItem(new QSpacerItem(30, 10, QSizePolicy::Preferred, QSizePolicy::Fixed));
 
     // video files location
     QLabel *path_label = new QLabel("Recording path:");
@@ -95,7 +95,7 @@ SystemForm::SystemForm(CamerasManager *manager, QWidget *parent) :
     path_layout->addLayout(path_buttons_layout);
 
     main_layout->addLayout(path_layout);
-    main_layout->addSpacerItem(new QSpacerItem(50, 10, QSizePolicy::Preferred, QSizePolicy::Fixed));
+    //main_layout->addSpacerItem(new QSpacerItem(50, 10, QSizePolicy::Preferred, QSizePolicy::Fixed));
 
     // attach to cameras manager
     connect(cameras_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SystemForm::changeCamera);

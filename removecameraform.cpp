@@ -32,7 +32,7 @@ RemoveCameraForm::RemoveCameraForm(CamerasManager *manager, QWidget *parent) :
     buttons_layout->addWidget(done_button);
 
     buttons_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    buttons_frame->setFixedHeight(60);
+    buttons_frame->setFixedHeight(50);
 
     cancel_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     cancel_button->setFixedSize(70, 40);
@@ -47,8 +47,8 @@ RemoveCameraForm::RemoveCameraForm(CamerasManager *manager, QWidget *parent) :
 
     // cameras list
     camera_list = new QListWidget();
-    camera_list->setFrameShape(QFrame::NoFrame);
-    camera_list->setStyleSheet("background-color: #E8F6F3");
+    //camera_list->setFrameShape(QFrame::NoFrame);
+    //camera_list->setStyleSheet("background-color: #E8F6F3");
     camera_list->setSelectionMode(QListWidget::MultiSelection);
 
     connect(camera_list, &QListWidget::itemChanged, this, &RemoveCameraForm::checkItemState);

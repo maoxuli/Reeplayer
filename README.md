@@ -12,3 +12,13 @@
 
 5. Build in QtCreator or with qmake & make 
 
+Check to make sure "/usr/local/bin" is in the PATH, which is necessary for pkg-config.
+
+otool -L Reeplayer.app/Contents/MacOS/Reeplayer
+
+6. Package 
+
+sudo macdeployqt Reeplayer.app/ -dmg
+
+
+
