@@ -12,17 +12,18 @@ Camera::Camera(int id, const std::string &ip,
     camera_ip(ip),
     camera_name(name),
     auto_connect(is_auto),
-    http_client("http://" + ip + ":8080"),
-    camera_client(http_client, JSONRPC_CLIENT_V2) // json-rpc 2.0
+    http_client("http://" + ip + ":8080")
 {
-    if (auto_connect)
-        connectService();
+    http_client.SetTimeout(3000);
+    if (auto_connect) {
+        connect();
+    }
 }
 
 Camera::~Camera()
 {
-    stopStreaming();
 }
+
 
 std::string Camera::stream_url() const
 {
@@ -31,16 +32,28 @@ std::string Camera::stream_url() const
     return url;
 }
 
-// start pulling with timer
-void Camera::connectService()
+// enable the rpc
+bool Camera::connect()
 {
+    camera_client.reset(new CameraClient(http_client, JSONRPC_CLIENT_V2));  // json-rpc 2.0
+}
 
+// disable the rpc
+bool Camera::disconnect()
+{
+    camera_client.reset();
+}
+
+bool Camera::connected() const
+{
+    return camera_client != nullptr;
 }
 
 bool Camera::restart()
 {
+    if (!connected()) return false;
     try {
-        camera_client.restart();
+        camera_client->restart();
         return true;
     }
     catch (JsonRpcException &ex) {
@@ -51,8 +64,9 @@ bool Camera::restart()
 
 bool Camera::shutdown()
 {
+    if (!connected()) return false;
     try {
-        camera_client.shutdown();
+        camera_client->shutdown();
         return true;
     }
     catch (JsonRpcException &ex) {
@@ -63,8 +77,9 @@ bool Camera::shutdown()
 
 bool Camera::changeMode(int mode)
 {
+    if (!connected()) return false;
     try {
-        return camera_client.changeMode(mode);
+        return camera_client->changeMode(mode);
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -75,8 +90,9 @@ bool Camera::changeMode(int mode)
 // call camera API to get state
 bool Camera::checkState(Camera::State &state)
 {
+    if (!connected()) return false;
     try {
-        Json::Value json_state = camera_client.checkState();
+        Json::Value json_state = camera_client->checkState();
         Json::FastWriter writer;
         qDebug() << writer.write(json_state).c_str();
         state.mode = json_state["mode"].asInt();
@@ -96,8 +112,9 @@ bool Camera::checkState(Camera::State &state)
 
 bool Camera::resetCalib()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.resetCalib();
+        return camera_client->resetCalib();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -107,8 +124,9 @@ bool Camera::resetCalib()
 
 bool Camera::saveCalib()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.saveCalib();
+        return camera_client->saveCalib();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -119,8 +137,9 @@ bool Camera::saveCalib()
 // return stream URL
 bool Camera::startStreaming()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.startStreaming();
+        return camera_client->startStreaming();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -130,8 +149,9 @@ bool Camera::startStreaming()
 
 bool Camera::stopStreaming()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.stopStreaming();
+        return camera_client->stopStreaming();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -141,8 +161,9 @@ bool Camera::stopStreaming()
 
 bool Camera::startRecording()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.startRecording();
+        return camera_client->startRecording();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -152,8 +173,9 @@ bool Camera::startRecording()
 
 bool Camera::stopRecording()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.stopRecording();
+        return camera_client->stopRecording();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -164,8 +186,9 @@ bool Camera::stopRecording()
 
 bool Camera::startUploading()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.startUploading();
+        return camera_client->startUploading();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -175,8 +198,9 @@ bool Camera::startUploading()
 
 bool Camera::stopUploading()
 {
+    if (!connected()) return false;
     try {
-        return camera_client.stopUploading();
+        return camera_client->stopUploading();
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -186,8 +210,9 @@ bool Camera::stopUploading()
 
 bool Camera::createFolder(const std::string &folder)
 {
+    if (!connected()) return false;
     try {
-        return camera_client.createFolder(folder);
+        return camera_client->createFolder(folder);
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -197,8 +222,9 @@ bool Camera::createFolder(const std::string &folder)
 
 bool Camera::changeFolder(const std::string &folder)
 {
+    if (!connected()) return false;
     try {
-        return camera_client.changeFolder(folder);
+        return camera_client->changeFolder(folder);
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -208,8 +234,9 @@ bool Camera::changeFolder(const std::string &folder)
 
 bool Camera::checkFolders(std::vector<Camera::Folder> &folders)
 {
+    if (!connected()) return false;
     try {
-        Json::Value json_folders = camera_client.checkFolders();
+        Json::Value json_folders = camera_client->checkFolders();
         for (auto it = json_folders.begin(); it != json_folders.end(); ++it) {
             Json::Value json_folder = *it;
             std::string folder_name = json_folder["name"].asString();
@@ -225,8 +252,9 @@ bool Camera::checkFolders(std::vector<Camera::Folder> &folders)
 
 bool Camera::checkFiles(std::vector<Camera::File> &files, const std::string& folder)
 {
+    if (!connected()) return false;
     try {
-        Json::Value json_files = camera_client.checkFiles(folder);
+        Json::Value json_files = camera_client->checkFiles(folder);
         for (auto it = json_files.begin(); it != json_files.end(); ++it) {
             Json::Value json_file = *it;
             std::string file_name = json_file["name"].asString();
@@ -244,6 +272,7 @@ bool Camera::checkFiles(std::vector<Camera::File> &files, const std::string& fol
 
 bool Camera::setFieldCorners(const std::vector<Camera::Corner> &corners)
 {
+    if (!connected()) return false;
     try {
         Json::Value json_corners(Json::arrayValue);
         for (int i = 0; i < corners.size(); i++) {
@@ -253,7 +282,7 @@ bool Camera::setFieldCorners(const std::vector<Camera::Corner> &corners)
             json_corner["y"] = corner.y;
             json_corners.append(json_corner);
         }
-        return camera_client.setFieldCorners(json_corners);
+        return camera_client->setFieldCorners(json_corners);
     }
     catch (JsonRpcException &ex) {
       qDebug() << ex.what();
@@ -263,8 +292,9 @@ bool Camera::setFieldCorners(const std::vector<Camera::Corner> &corners)
 
 bool Camera::fieldCorners(std::vector<Camera::Corner> &corners)
 {
+    if (!connected()) return false;
     try {
-        Json::Value json_corners = camera_client.fieldCorners();
+        Json::Value json_corners = camera_client->fieldCorners();
         for (auto it = json_corners.begin(); it != json_corners.end(); ++it) {
             Json::Value json_corner = *it;
             int corner_x = json_corner["x"].asInt();

@@ -18,6 +18,8 @@ public:
 public slots:
     void changeCamera(int idx);
     void applyMode();
+    void restart();
+    void shutdown();
     void applyPath();
     void showAddPath();
 

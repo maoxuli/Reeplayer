@@ -69,7 +69,7 @@ FileState::~FileState()
 
 void FileState::showEvent(QShowEvent *event)
 {
-    updateState();
+    //updateState();
     update_timer->start(1000);
     QWidget::showEvent(event);
 }
@@ -98,16 +98,16 @@ void FileState::updateState()
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
     Camera::State state;
-    if (camera->checkState(state)) {
+    std::string image;
+    if (!camera->connected()) { // disconnected
+        image = ":images/gray-light.png";
+    }
+    else if (camera->checkState(state)) { // normal
         bool uploading_state = state.uploading;
-        std::string image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
-        camera_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
-        // files
-
+        image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
     }
-    else {
-        bool link_state = false;
-        std::string image = link_state ? ":images/green-light.png" : ":images/yellow-light.png";
-        camera_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+    else { // failure
+        image = ":images/yellow-light.png";
     }
+    camera_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
 }

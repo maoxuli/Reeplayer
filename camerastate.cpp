@@ -26,7 +26,7 @@ CameraState::CameraState(Camera *camera, QWidget *parent) :
     camera_name_label->setFixedHeight(40);
 
     // link_state
-    link_state_label = new QLabel();
+    link_state_label = new ClickableLabel();
     link_state_label->setStyleSheet("background-color: #A9CCE3");
     link_state_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     link_state_label->setFixedSize(40, 40);
@@ -78,7 +78,8 @@ CameraState::CameraState(Camera *camera, QWidget *parent) :
     battery_state_label->setStyleSheet("background-color: #F5EEF8");
     battery_state_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     battery_state_label->setFixedSize(40, 40);
-    battery_state_label->setPixmap(QIcon(":images/gray-light.png").pixmap(25, 25));
+    battery_state_label->setText("0.0%");
+    //battery_state_label->setPixmap(QIcon(":images/gray-light.png").pixmap(25, 25));
 
     QSpacerItem *spacer = new QSpacerItem(40, 40, QSizePolicy::Preferred, QSizePolicy::Expanding);
 
@@ -98,6 +99,7 @@ CameraState::CameraState(Camera *camera, QWidget *parent) :
     state_grid->addItem(spacer, 5, 0, 1, 2);
     setLayout(state_grid);
 
+    connect(link_state_label, &ClickableLabel::clicked, this, &CameraState::connection);
     connect(streaming_state_label, &ClickableLabel::clicked, this, &CameraState::streaming);
     connect(recording_state_label, &ClickableLabel::clicked, this, &CameraState::recording);
     connect(uploading_state_label, &ClickableLabel::clicked, this, &CameraState::uploading);
@@ -113,7 +115,7 @@ CameraState::~CameraState()
 
 void CameraState::showEvent(QShowEvent *event)
 {
-    updateState();
+    //updateState();
     update_timer->start(1000);
     QWidget::showEvent(event);
 }
@@ -122,6 +124,15 @@ void CameraState::hideEvent(QHideEvent *event)
 {
     update_timer->stop();
     QWidget::hideEvent(event);
+}
+
+void CameraState::connection()
+{
+    assert(camera);
+    if (camera->connected())
+        camera->disconnect();
+    else
+        camera->connect();
 }
 
 void CameraState::streaming()
@@ -167,29 +178,39 @@ void CameraState::updateState()
 {
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
-    std::string image;
+    std::string link_image, streaming_image, recording_image, uploading_image;
+    float battery_percent = 0;
     Camera::State state;
-    if (camera->checkState(state)) {
-        bool link_state = true;
-        image = link_state ? ":images/green-light.png" : ":images/yellow-light.png";
-        link_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+    if (!camera->connected()) { // disconnected
+        link_image = ":images/gray-light.png";
+        streaming_image = ":images/gray-light.png";
+        recording_image = ":images/gray-light.png";
+        uploading_image = ":images/gray-light.png";
+        battery_percent = 0;
+    }
+    else if (camera->checkState(state)) { // connected
+        link_image = ":images/green-light.png";
         bool streaming_state = state.streaming;
-        image = streaming_state ? ":images/green-light.png" : ":images/gray-light.png";
-        streaming_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+        streaming_image = streaming_state ? ":images/green-light.png" : ":images/gray-light.png";
         bool recording_state = state.recording;
-        image = recording_state ? ":images/red-light.png" : ":images/gray-light.png";
-        recording_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+        recording_image = recording_state ? ":images/red-light.png" : ":images/gray-light.png";
         bool uploading_state = state.uploading;
-        image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
-        uploading_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
-        float battery_percent = state.battery;
-        image = battery_percent > 10 ? ":images/green-light.png" : ":images/yellow-light.png";
-        battery_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+        uploading_image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
+        battery_percent = state.battery;
     }
-    else {
-        bool link_state = false;
-        image = link_state ? ":images/green-light.png" : ":images/yellow-light.png";
-        link_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+    else { // failure
+        link_image = ":images/yellow-light.png";
+        streaming_image = ":images/yellow-light.png";
+        recording_image = ":images/yellow-light.png";
+        uploading_image = ":images/yellow-light.png";
+        battery_percent = 0;
     }
-}
 
+    link_state_label->setPixmap(QIcon(link_image.c_str()).pixmap(25, 25));
+    streaming_state_label->setPixmap(QIcon(streaming_image.c_str()).pixmap(25, 25));
+    recording_state_label->setPixmap(QIcon(recording_image.c_str()).pixmap(25, 25));
+    uploading_state_label->setPixmap(QIcon(uploading_image.c_str()).pixmap(25, 25));
+    char percent_text[16];
+    sprintf(percent_text, "%.1f%%", battery_percent);
+    battery_state_label->setText(percent_text);
+}

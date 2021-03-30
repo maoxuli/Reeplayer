@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include <QObject>
+#include <memory>
 
 #include "cameraclient.h"
 #include <jsonrpccpp/client.h>
@@ -21,6 +22,10 @@ public:
     std::string ip() const { return camera_ip; }
     std::string name() const { return camera_name; }
     bool is_auto() const { return auto_connect; }
+
+    bool connect();
+    bool disconnect();
+    bool connected() const;
 
     std::string stream_url() const;
 
@@ -86,7 +91,6 @@ public:
     bool fieldCorners(std::vector<Corner> &corners);
 
 public slots:
-    void connectService();
 
 signals:
 
@@ -99,7 +103,7 @@ private:
 
     // json rpc
     jsonrpc::HttpClient http_client;
-    CameraClient camera_client;
+    std::shared_ptr<CameraClient> camera_client;
 };
 
 #endif // CAMERA_H

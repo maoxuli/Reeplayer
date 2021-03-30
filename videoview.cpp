@@ -175,7 +175,7 @@ void VideoView::enableControl(bool enable)
 
 void VideoView::showEvent(QShowEvent *event)
 {
-    updateState();
+    //updateState();
     state_timer->start(1000);
     ImageView::showEvent(event);
 }
@@ -231,7 +231,6 @@ void VideoView::stop()
     if (pipeline) {
         pipeline->SetPipelineState(GST_STATE_NULL);
         pipeline.reset();
-        //camera->stopStreaming();
     }
     video_width = 0;
     video_height = 0;
@@ -309,29 +308,34 @@ void VideoView::updateState()
     if (!camera) return;
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
-    std::string image;
+    std::string streaming_image, recording_image;
     Camera::State state;
-    if (!camera->checkState(state)) {
-        image = ":images/gray-light.png";
-        recording_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
-        image = ":images/yellow-light.png";
-        streaming_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
-        reset_calib_button->hide();
-        save_calib_button->hide();
-        return;
-    }
-    if (state.mode > 0) {
-        reset_calib_button->show();
-        save_calib_button->show();
-    }
-    else {
+    if (!camera->connected()) { // disconnected
+        streaming_image = ":images/gray-light.png";
+        recording_image = ":images/gray-light.png";
         reset_calib_button->hide();
         save_calib_button->hide();
     }
-    bool streaming_state = state.streaming;
-    bool recording_state = state.recording;
-    image = streaming_state ? ":images/green-light.png" : ":images/gray-light.png";
-    streaming_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
-    image = recording_state ? ":images/red-light.png" : ":images/gray-light.png";
-    recording_state_label->setPixmap(QIcon(image.c_str()).pixmap(25, 25));
+    else if (camera->checkState(state)) {
+        bool streaming_state = state.streaming;
+        streaming_image = streaming_state ? ":images/green-light.png" : ":images/gray-light.png";
+        bool recording_state = state.recording;
+        recording_image = recording_state ? ":images/red-light.png" : ":images/gray-light.png";
+        if (state.mode > 0) {
+            reset_calib_button->show();
+            save_calib_button->show();
+        }
+        else {
+            reset_calib_button->hide();
+            save_calib_button->hide();
+        }
+    }
+    else { // failure
+        streaming_image = ":images/yellow-light.png";
+        recording_image = ":images/yellow-light.png";
+        reset_calib_button->hide();
+        save_calib_button->hide();
+    }
+    streaming_state_label->setPixmap(QIcon(streaming_image.c_str()).pixmap(25, 25));
+    recording_state_label->setPixmap(QIcon(recording_image.c_str()).pixmap(25, 25));
 }

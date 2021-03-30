@@ -17,6 +17,7 @@ public:
     ~CameraState();
 
 private slots:
+    void connection();
     void streaming();
     void recording();
     void uploading();
@@ -33,7 +34,7 @@ private:
     // update state
     QTimer *update_timer;
     QLabel *camera_name_label;
-    QLabel *link_state_label;
+    ClickableLabel *link_state_label;
     ClickableLabel *streaming_state_label;
     ClickableLabel *recording_state_label;
     ClickableLabel *uploading_state_label;
