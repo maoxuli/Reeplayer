@@ -151,6 +151,7 @@ void SystemForm::showEvent(QShowEvent *event)
 
     camera = cameras->GetCurrentCamera();
     if (camera) {
+        camera->connect();
         updateState();
     }
 
@@ -181,10 +182,13 @@ void SystemForm::updateState()
     assert(cameras);
     Camera *camera = cameras->GetCurrentCamera();
     if (camera) {
-        Camera::State state;
-        if (camera->checkState(state)) {
+        Camera::LiveState state;
+        if (camera->checkLiveState(state)) {
             int mode = state.mode;
-            mode_group->button(mode)->setChecked(true);
+            if (mode > 0)
+                mode_group->button(mode)->setChecked(true);
+            else
+                mode_group->checkedButton()->setChecked(false);
         }
     }
 }
@@ -216,7 +220,7 @@ void SystemForm::applyMode()
     assert(cameras);
     Camera *camera = cameras->GetCurrentCamera();
     if (camera) {
-        camera->changeMode(mode);
+        camera->changeLiveMode(mode);
         updateState();
     }
 }

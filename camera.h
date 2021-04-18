@@ -23,63 +23,80 @@ public:
     std::string name() const { return camera_name; }
     bool is_auto() const { return auto_connect; }
 
+    // rpc connection
     bool connect();
     bool disconnect();
     bool connected() const;
 
-    std::string stream_url() const;
+    std::string live_stream_url() const;
 
+    // system
     bool restart();
     bool shutdown();
-    bool changeMode(int mode);
 
-    struct State
+    struct SystemState
+    {
+        float battery;
+        float temperature;
+    };
+
+    bool checkSystemState(SystemState &state);
+
+    // file system
+    struct FolderInfo
+    {
+        std::string path;
+        FolderInfo(const std::string& folder_path) : path(folder_path) {}
+    };
+
+    bool checkFolders(std::vector<FolderInfo> &folders);
+
+    bool createFolder(const std::string &path);
+    bool changeFolder(const std::string &path);
+    bool checkCurrentFolder(const std::string &path);
+
+    struct FileInfo
+    {
+        std::string path;
+        uint64_t size;
+        FileInfo(const std::string& file_path, uint64_t file_size)
+            : path(file_path), size(file_size) {}
+    };
+
+    bool checkFiles(std::vector<FileInfo> &files, const std::string &path = "");
+
+    // live stitching
+    bool changeLiveMode(int mode);
+    bool startCalib();
+    bool pauseCalib();
+    bool resetCalib();
+    bool saveCalib();
+    bool startStreaming();
+    bool stopStreaming();
+    bool startRecording();
+    bool stopRecording();
+
+    struct LiveState
     {
         int mode;
         bool streaming;
         bool recording;
-        bool uploading;
-        float battery;
-        float temperature;
-        std::string folder;
     };
 
-    bool checkState(State &state);
+    bool checkLiveState(LiveState &state);
 
-    bool resetCalib();
-    bool saveCalib();
-
-    bool startStreaming();
-    bool stopStreaming();
-
-    bool startRecording();
-    bool stopRecording();
-
+    // file uploading
     bool startUploading();
     bool stopUploading();
 
-    bool createFolder(const std::string &folder);
-    bool changeFolder(const std::string &folder);
-
-    struct Folder
+    struct UploadState
     {
-        std::string name;
-        Folder(const std::string& folder_name) : name(folder_name) {}
+       bool uploading;
     };
 
-    bool checkFolders(std::vector<Folder> &folders);
+    bool checkUploadState(UploadState& state);
 
-    struct File
-    {
-        std::string name;
-        uint64_t size;
-        float uploading;
-        File(const std::string& file_name, uint64_t file_size, float file_uploading)
-            : name(file_name), size(file_size), uploading(file_uploading) {}
-    };
-
-    bool checkFiles(std::vector<File> &files, const std::string &folder = "");
-
+    // field corners
     struct Corner
     {
        int x;
@@ -88,7 +105,7 @@ public:
     };
 
     bool setFieldCorners(const std::vector<Corner> &corners);
-    bool fieldCorners(std::vector<Corner> &corners);
+    bool checkFieldCorners(std::vector<Corner> &corners);
 
 public slots:
 

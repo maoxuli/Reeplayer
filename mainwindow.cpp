@@ -26,7 +26,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-    setWindowTitle("Reeplayer");
+    setWindowTitle("Reeplayer 0.3.0");
     setVertical();
 
     // cameras manager

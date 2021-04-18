@@ -83,8 +83,8 @@ void FileState::hideEvent(QHideEvent *event)
 void FileState::uploading()
 {
     assert(camera);
-    Camera::State state;
-    if (camera->checkState(state)) {
+    Camera::UploadState state;
+    if (camera->checkUploadState(state)) {
         bool uploading_state = state.uploading;
         if (uploading_state)
             camera->stopUploading();
@@ -97,12 +97,12 @@ void FileState::updateState()
 {
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
-    Camera::State state;
+    Camera::UploadState state;
     std::string image;
     if (!camera->connected()) { // disconnected
         image = ":images/gray-light.png";
     }
-    else if (camera->checkState(state)) { // normal
+    else if (camera->checkUploadState(state)) { // normal
         bool uploading_state = state.uploading;
         image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
     }

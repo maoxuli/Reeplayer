@@ -138,8 +138,8 @@ void CameraState::connection()
 void CameraState::streaming()
 {
     assert(camera);
-    Camera::State state;
-    if (camera->checkState(state)) {
+    Camera::LiveState state;
+    if (camera->checkLiveState(state)) {
         bool streaming_state = state.streaming;
         if (streaming_state)
             camera->stopStreaming();
@@ -151,8 +151,8 @@ void CameraState::streaming()
 void CameraState::recording()
 {
     assert(camera);
-    Camera::State state;
-    if (camera->checkState(state)) {
+    Camera::LiveState state;
+    if (camera->checkLiveState(state)) {
         bool recording_state = state.recording;
         if (recording_state)
             camera->stopRecording();
@@ -164,8 +164,8 @@ void CameraState::recording()
 void CameraState::uploading()
 {
     assert(camera);
-    Camera::State state;
-    if (camera->checkState(state)) {
+    Camera::UploadState state;
+    if (camera->checkUploadState(state)) {
         bool uploading_state = state.uploading;
         if (uploading_state)
             camera->stopUploading();
@@ -180,7 +180,9 @@ void CameraState::updateState()
     camera_name_label->setText(camera->name().c_str());
     std::string link_image, streaming_image, recording_image, uploading_image;
     float battery_percent = 0;
-    Camera::State state;
+    Camera::SystemState system_state;
+    Camera::LiveState live_state;
+    Camera::UploadState upload_state;
     if (!camera->connected()) { // disconnected
         link_image = ":images/gray-light.png";
         streaming_image = ":images/gray-light.png";
@@ -188,15 +190,17 @@ void CameraState::updateState()
         uploading_image = ":images/gray-light.png";
         battery_percent = 0;
     }
-    else if (camera->checkState(state)) { // connected
+    else if (camera->checkSystemState(system_state) &&
+             camera->checkLiveState(live_state) &&
+             camera->checkUploadState(upload_state)) { // connected
         link_image = ":images/green-light.png";
-        bool streaming_state = state.streaming;
+        bool streaming_state = live_state.streaming;
         streaming_image = streaming_state ? ":images/green-light.png" : ":images/gray-light.png";
-        bool recording_state = state.recording;
+        bool recording_state = live_state.recording;
         recording_image = recording_state ? ":images/red-light.png" : ":images/gray-light.png";
-        bool uploading_state = state.uploading;
+        bool uploading_state = upload_state.uploading;
         uploading_image = uploading_state ? ":images/green-light.png" : ":images/gray-light.png";
-        battery_percent = state.battery;
+        battery_percent = system_state.battery;
     }
     else { // failure
         link_image = ":images/yellow-light.png";

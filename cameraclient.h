@@ -12,35 +12,123 @@ class CameraClient : public jsonrpc::Client
     public:
         CameraClient(jsonrpc::IClientConnector &conn, jsonrpc::clientVersion_t type = jsonrpc::JSONRPC_CLIENT_V2) : jsonrpc::Client(conn, type) {}
 
-        void restart() throw (jsonrpc::JsonRpcException)
+        bool restart(const std::string& password) throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
-            p = Json::nullValue;
-            this->CallNotification("restart",p);
-        }
-        void shutdown() throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p = Json::nullValue;
-            this->CallNotification("shutdown",p);
-        }
-        bool changeMode(int mode) throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p["mode"] = mode;
-            Json::Value result = this->CallMethod("changeMode",p);
+            p["password"] = password;
+            Json::Value result = this->CallMethod("restart",p);
             if (result.isBool())
                 return result.asBool();
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
-        Json::Value checkState() throw (jsonrpc::JsonRpcException)
+        bool shutdown(const std::string& password) throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p["password"] = password;
+            Json::Value result = this->CallMethod("shutdown",p);
+            if (result.isBool())
+                return result.asBool();
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        Json::Value checkSystemState() throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
             p = Json::nullValue;
-            Json::Value result = this->CallMethod("checkState",p);
+            Json::Value result = this->CallMethod("checkSystemState",p);
             if (result.isObject())
                 return result;
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        Json::Value checkFolders() throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p = Json::nullValue;
+            Json::Value result = this->CallMethod("checkFolders",p);
+            if (result.isArray())
+                return result;
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        bool createFolder(const std::string& path) throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p["path"] = path;
+            Json::Value result = this->CallMethod("createFolder",p);
+            if (result.isBool())
+                return result.asBool();
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        bool changeFolder(const std::string& path) throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p["path"] = path;
+            Json::Value result = this->CallMethod("changeFolder",p);
+            if (result.isBool())
+                return result.asBool();
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        std::string checkCurrentFolder() throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p = Json::nullValue;
+            Json::Value result = this->CallMethod("checkCurrentFolder",p);
+            if (result.isString())
+                return result.asString();
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        Json::Value checkFiles(const std::string& path) throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p["path"] = path;
+            Json::Value result = this->CallMethod("checkFiles",p);
+            if (result.isArray())
+                return result;
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        bool changeLiveMode(int mode) throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p["mode"] = mode;
+            Json::Value result = this->CallMethod("changeLiveMode",p);
+            if (result.isBool())
+                return result.asBool();
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        Json::Value checkLiveState() throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p = Json::nullValue;
+            Json::Value result = this->CallMethod("checkLiveState",p);
+            if (result.isObject())
+                return result;
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        bool startCalib() throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p = Json::nullValue;
+            Json::Value result = this->CallMethod("startCalib",p);
+            if (result.isBool())
+                return result.asBool();
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
+        bool pauseCalib() throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p = Json::nullValue;
+            Json::Value result = this->CallMethod("pauseCalib",p);
+            if (result.isBool())
+                return result.asBool();
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
@@ -104,6 +192,16 @@ class CameraClient : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
+        Json::Value checkUploadState() throw (jsonrpc::JsonRpcException)
+        {
+            Json::Value p;
+            p = Json::nullValue;
+            Json::Value result = this->CallMethod("checkUploadState",p);
+            if (result.isObject())
+                return result;
+            else
+                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+        }
         bool startUploading() throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
@@ -124,46 +222,6 @@ class CameraClient : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
-        bool createFolder(const std::string& name) throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p["name"] = name;
-            Json::Value result = this->CallMethod("createFolder",p);
-            if (result.isBool())
-                return result.asBool();
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-        }
-        bool changeFolder(const std::string& name) throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p["name"] = name;
-            Json::Value result = this->CallMethod("changeFolder",p);
-            if (result.isBool())
-                return result.asBool();
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-        }
-        Json::Value checkFolders() throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p = Json::nullValue;
-            Json::Value result = this->CallMethod("checkFolders",p);
-            if (result.isArray())
-                return result;
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-        }
-        Json::Value checkFiles(const std::string& folder) throw (jsonrpc::JsonRpcException)
-        {
-            Json::Value p;
-            p["folder"] = folder;
-            Json::Value result = this->CallMethod("checkFiles",p);
-            if (result.isArray())
-                return result;
-            else
-                throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
-        }
         bool setFieldCorners(const Json::Value& corners) throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
@@ -174,11 +232,11 @@ class CameraClient : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
-        Json::Value fieldCorners() throw (jsonrpc::JsonRpcException)
+        Json::Value checkFieldCorners() throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;
             p = Json::nullValue;
-            Json::Value result = this->CallMethod("fieldCorners",p);
+            Json::Value result = this->CallMethod("checkFieldCorners",p);
             if (result.isArray())
                 return result;
             else

@@ -62,6 +62,8 @@ VideoView::VideoView(Camera *_camera, QWidget *parent) :
     actual_size_button = new QPushButton("=", this);
     fit_window_button = new QPushButton("[]", this);
 
+    start_calib_button = new QPushButton("Start");
+    pause_calib_button = new QPushButton("Pause");
     reset_calib_button = new QPushButton("Reset");
     save_calib_button = new QPushButton("Save");
 
@@ -92,6 +94,12 @@ VideoView::VideoView(Camera *_camera, QWidget *parent) :
     fit_window_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     fit_window_button->setFixedSize(40, 40);
 
+    start_calib_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    start_calib_button->setFixedSize(60, 40);
+
+    pause_calib_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pause_calib_button->setFixedSize(60, 40);
+
     reset_calib_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     reset_calib_button->setFixedSize(60, 40);
 
@@ -111,6 +119,8 @@ VideoView::VideoView(Camera *_camera, QWidget *parent) :
     buttons_layout->addWidget(actual_size_button);
     buttons_layout->addWidget(fit_window_button);
     buttons_layout->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Fixed, QSizePolicy::Preferred));
+    buttons_layout->addWidget(start_calib_button);
+    buttons_layout->addWidget(pause_calib_button);
     buttons_layout->addWidget(reset_calib_button);
     buttons_layout->addWidget(save_calib_button);
 
@@ -132,6 +142,8 @@ VideoView::VideoView(Camera *_camera, QWidget *parent) :
     connect(zoom_out_button, &QPushButton::clicked, this, &ImageView::zoomOut);
     connect(actual_size_button, &QPushButton::clicked, this, &ImageView::actualSize);
     connect(fit_window_button, &QPushButton::clicked, this, &ImageView::fitWindow);
+    connect(start_calib_button, &QPushButton::clicked, this, &VideoView::startCalib);
+    connect(pause_calib_button, &QPushButton::clicked, this, &VideoView::pauseCalib);
     connect(reset_calib_button, &QPushButton::clicked, this, &VideoView::resetCalib);
     connect(save_calib_button, &QPushButton::clicked, this, &VideoView::saveCalib);
 
@@ -198,15 +210,20 @@ void VideoView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void VideoView::play()
 {
-    //qDebug() << "video view play...";
+    qDebug() << "video view play...";
     if (!pipeline) {
         assert(camera);
+        qDebug() << "start streaming";
         if (camera->startStreaming()) {
-            std::string stream_url = camera->stream_url();
+            std::string stream_url = camera->live_stream_url();
+            qDebug() << "url: " << stream_url.c_str();
             std::string pipeline_str = CreateRtspSinkPipeline(stream_url);
             pipeline.reset(new GstAppSinkPipeline());
             //pipeline->set_is_verbose(true);
             pipeline->Initialize(pipeline_str);
+        }
+        else {
+            qDebug() << "failed start streaming";
         }
     }
 
@@ -226,9 +243,10 @@ void VideoView::pause()
 
 void VideoView::stop()
 {
-    //qDebug() << "video view stop...";
+    qDebug() << "video view stop...";
     video_timer->stop();
     if (pipeline) {
+        qDebug() << "reset pipeline";
         pipeline->SetPipelineState(GST_STATE_NULL);
         pipeline.reset();
     }
@@ -238,6 +256,18 @@ void VideoView::stop()
 }
 
 // control calib
+void VideoView::startCalib()
+{
+    assert(camera);
+    camera->startCalib();
+}
+
+void VideoView::pauseCalib()
+{
+    assert(camera);
+    camera->pauseCalib();
+}
+
 void VideoView::resetCalib()
 {
     assert(camera);
@@ -254,8 +284,12 @@ void VideoView::saveCalib()
 void VideoView::streaming()
 {
     assert(camera);
-    Camera::State state;
-    if (camera->checkState(state)) {
+    if (!camera->connected()) {
+        qDebug() << "connect for streaming";
+        camera->connect();
+    }
+    Camera::LiveState state;
+    if (camera->checkLiveState(state)) {
         bool streaming_state = state.streaming;
         if (streaming_state) {
             camera->stopStreaming();
@@ -266,19 +300,29 @@ void VideoView::streaming()
             play();
         }
     }
+    else {
+        qDebug() << "failed to get live state";
+    }
 }
 
 // control recording
 void VideoView::recording()
 {
     assert(camera);
-    Camera::State state;
-    if (camera->checkState(state)) {
+    if (!camera->connected()) {
+        qDebug() << "connect for recording";
+        camera->connect();
+    }
+    Camera::LiveState state;
+    if (camera->checkLiveState(state)) {
         bool recording_state = state.recording;
         if (recording_state)
             camera->stopRecording();
         else
             camera->startRecording();
+    }
+    else {
+        qDebug() << "failed to get live state";
     }
 }
 
@@ -309,23 +353,29 @@ void VideoView::updateState()
     assert(camera);
     camera_name_label->setText(camera->name().c_str());
     std::string streaming_image, recording_image;
-    Camera::State state;
+    Camera::LiveState state;
     if (!camera->connected()) { // disconnected
         streaming_image = ":images/gray-light.png";
         recording_image = ":images/gray-light.png";
+        start_calib_button->hide();
+        pause_calib_button->hide();
         reset_calib_button->hide();
         save_calib_button->hide();
     }
-    else if (camera->checkState(state)) {
+    else if (camera->checkLiveState(state)) {
         bool streaming_state = state.streaming;
         streaming_image = streaming_state ? ":images/green-light.png" : ":images/gray-light.png";
         bool recording_state = state.recording;
         recording_image = recording_state ? ":images/red-light.png" : ":images/gray-light.png";
         if (state.mode > 0) {
+            start_calib_button->show();
+            pause_calib_button->show();
             reset_calib_button->show();
             save_calib_button->show();
         }
         else {
+            start_calib_button->hide();
+            pause_calib_button->hide();
             reset_calib_button->hide();
             save_calib_button->hide();
         }
@@ -333,6 +383,8 @@ void VideoView::updateState()
     else { // failure
         streaming_image = ":images/yellow-light.png";
         recording_image = ":images/yellow-light.png";
+        start_calib_button->hide();
+        pause_calib_button->hide();
         reset_calib_button->hide();
         save_calib_button->hide();
     }

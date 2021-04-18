@@ -39,6 +39,8 @@ private slots:
     void updateFrame();
     void updateState();
 
+    void startCalib();
+    void pauseCalib();
     void resetCalib();
     void saveCalib();
 
@@ -66,6 +68,8 @@ private:
     QPushButton *actual_size_button;
     QPushButton *fit_window_button;
 
+    QPushButton *start_calib_button;
+    QPushButton *pause_calib_button;
     QPushButton *reset_calib_button;
     QPushButton *save_calib_button;
 
